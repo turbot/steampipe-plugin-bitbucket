@@ -17,15 +17,16 @@ func connect(ctx context.Context, d *plugin.QueryData) *bitbucket.Client {
 
 	// Get connection config for plugin
 	bitbucketConfig := GetConfig(d.Connection)
-	if &bitbucketConfig != nil {
-		if bitbucketConfig.Username != nil {
-			username = *bitbucketConfig.Username
-		}
-		if bitbucketConfig.Password != nil {
-			password = *bitbucketConfig.Password
-		}
+	if bitbucketConfig.Username != nil {
+		username = *bitbucketConfig.Username
+	}
+	if bitbucketConfig.Password != nil {
+		password = *bitbucketConfig.Password
 	}
 
+	if username == "" {
+		panic("'username' must be set in the connection configuration. Edit your connection configuration file and then restart Steampipe")
+	}
 	if password == "" {
 		panic("'password' must be set in the connection configuration. Edit your connection configuration file and then restart Steampipe")
 	}
@@ -47,6 +48,6 @@ func parseRepoFullName(fullName string) (string, string) {
 	return owner, repo
 }
 
-func repositoryFullNameQual(_ context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	return d.KeyColumnQuals["repository_full_name"].GetStringValue(), nil
-}
+// func repositoryFullNameQual(_ context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+// 	return d.KeyColumnQuals["repository_full_name"].GetStringValue(), nil
+// }
