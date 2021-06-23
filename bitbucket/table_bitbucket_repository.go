@@ -86,13 +86,13 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Name:        "is_private",
 			Description: "Indicates whether the repository is publicly accessible, or whether it is private to the team and consequently only visible to team members.",
 			Type:        proto.ColumnType_BOOL,
-			Transform:   transform.FromField("is_private"),
+			Transform:   transform.FromField("Is_private"),
 		},
 		{
 			Name:        "has_issues",
 			Description: "To initialize or disable the new repo's issue tracker",
 			Type:        proto.ColumnType_STRING,
-			Transform:   transform.FromField("has_issues"),
+			Transform:   transform.FromField("Has_issues"),
 		},
 		{
 			Name:        "links",
@@ -111,7 +111,12 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 		},
 		{
 			Name:        "parent",
-			Description: "Details of the parent for repository",
+			Description: "Details of the parent for repository.",
+			Type:        proto.ColumnType_JSON,
+		},
+		{
+			Name:        "project",
+			Description: "Details of the project associated with the repository.",
 			Type:        proto.ColumnType_JSON,
 		},
 	}
