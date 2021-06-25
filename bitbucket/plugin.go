@@ -19,6 +19,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 		TableMap: map[string]*plugin.Table{
 			"bitbucket_my_repository": tableBitBucketMyRepository(ctx),
 			"bitbucket_repository":    tableBitBucketRepository(ctx),
+			"bitbucket_workspace":     tableBitBucketWorkspace(ctx),
 		},
 	}
 	return p
