@@ -104,21 +104,29 @@ func tableBitbucketProjectList(ctx context.Context, d *plugin.QueryData, h *plug
 	workspace := h.Item.(bitbucket.Workspace)
 	client := connect(ctx, d)
 
-	resp, err := client.HttpClient.Get(client.GetApiBaseURL() + fmt.Sprintf("/workspaces/%s/projects", workspace.Slug))
-	if err != nil {
-		return nil, err
-	}
-	projectList := new(ProjectList)
-	err = decodeResponse(resp, projectList)
-	if err != nil {
-		return nil, err
-	}
+	urlStr := client.GetApiBaseURL() + fmt.Sprintf("/workspaces/%s/projects", workspace.Slug)
 
-	for _, project := range projectList.Projects {
-		d.StreamListItem(ctx, project)
-	}
+	for {
+		resp, err := client.HttpClient.Get(urlStr)
+		if err != nil {
+			return nil, err
+		}
+		projectList := new(ProjectList)
+		err = decodeResponse(resp, projectList)
+		if err != nil {
+			return nil, err
+		}
 
-	return nil, nil
+		for _, project := range projectList.Projects {
+			d.StreamListItem(ctx, project)
+		}
+
+		if projectList.Next == "" {
+			return nil, nil
+		}
+		// update urlstring with the link of next page
+		urlStr = projectList.Next
+	}
 }
 
 type ProjectList struct {
@@ -126,6 +134,8 @@ type ProjectList struct {
 	Pagelen  int       `json:"pagelen,omitempty"`
 	MaxDepth int       `json:"maxDepth,omitempty"`
 	Size     int       `json:"size,omitempty"`
+	Next     string    `json:"next,omitempty"`
+	Previous string    `json:"previous,omitempty"`
 	Projects []Project `json:"values,omitempty"`
 }
 
