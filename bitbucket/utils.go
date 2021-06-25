@@ -2,6 +2,8 @@ package bitbucket
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
 	"os"
 	"strings"
 
@@ -46,6 +48,15 @@ func parseRepoFullName(fullName string) (string, string) {
 		repo = s[1]
 	}
 	return owner, repo
+}
+
+// decode API raw response
+func decodeResponse(resp *http.Response, v interface{}) error {
+	err := json.NewDecoder(resp.Body).Decode(v)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // func repositoryFullNameQual(_ context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
