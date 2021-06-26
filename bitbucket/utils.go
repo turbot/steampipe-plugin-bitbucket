@@ -59,6 +59,16 @@ func decodeResponse(resp *http.Response, v interface{}) error {
 	return nil
 }
 
-// func repositoryFullNameQual(_ context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-// 	return d.KeyColumnQuals["repository_full_name"].GetStringValue(), nil
-// }
+// decodeJson(apiResponse, responseStruct):: converts raw apiResponse to required output struct
+func decodeJson(response interface{}, respObject interface{}) error {
+	resp, err := json.Marshal(response)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(resp, respObject)
+	if err != nil {
+		return err
+	}
+	return nil
+}
