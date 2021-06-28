@@ -95,18 +95,38 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Transform:   transform.FromField("Has_issues"),
 		},
 		{
-			Name:        "links",
-			Description: "A link to a resource related to this repository.",
-			Type:        proto.ColumnType_JSON,
+			Name:        "owner_account_id",
+			Description: "Jira account id of the owner.",
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Owner.account_id"),
+		},
+		{
+			Name:        "owner_display_name",
+			Description: "Display name of the owner the repository.",
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Owner.display_name"),
+		},
+		{
+			Name:        "owner_type",
+			Description: "Type of the owner of the repository. Can be a user or team.",
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Owner.type"),
+		},
+		{
+			Name:        "owner_uuid",
+			Description: "Bitbucket UUID of the owner.",
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Owner.uuid"),
+		},
+		{
+			Name:        "self_link",
+			Description: "Self link to this repository.",
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Links.self.href"),
 		},
 		{
 			Name:        "mainbranch",
 			Description: "Details of the main branch of the repository.",
-			Type:        proto.ColumnType_JSON,
-		},
-		{
-			Name:        "owner",
-			Description: "User/Team details of the owner the repository.",
 			Type:        proto.ColumnType_JSON,
 		},
 		{
