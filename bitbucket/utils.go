@@ -13,7 +13,7 @@ import (
 )
 
 // create service client
-func connect(ctx context.Context, d *plugin.QueryData) *bitbucket.Client {
+func connect(_ context.Context, d *plugin.QueryData) *bitbucket.Client {
 	username := os.Getenv("BITBUCKET_USERNAME")
 	password := os.Getenv("BITBUCKET_PASSWORD")
 	baseurl := os.Getenv("BITBUCKET_API_BASE_URL")

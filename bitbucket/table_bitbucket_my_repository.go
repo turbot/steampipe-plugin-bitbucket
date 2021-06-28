@@ -18,7 +18,7 @@ func tableBitBucketMyRepository(_ context.Context) *plugin.Table {
 	}
 }
 
-func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	client := connect(ctx, d)
 
 	repos, err := client.Repositories.ListForAccount(&bitbucket.RepositoriesOptions{

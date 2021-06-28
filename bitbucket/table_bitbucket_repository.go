@@ -21,7 +21,7 @@ func tableBitBucketRepository(_ context.Context) *plugin.Table {
 	}
 }
 
-func tableBitbucketRepositoryList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func tableBitbucketRepositoryList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	repoFullName := d.KeyColumnQuals["full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
 
