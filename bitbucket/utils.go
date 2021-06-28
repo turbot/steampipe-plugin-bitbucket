@@ -16,6 +16,7 @@ import (
 func connect(ctx context.Context, d *plugin.QueryData) *bitbucket.Client {
 	username := os.Getenv("BITBUCKET_USERNAME")
 	password := os.Getenv("BITBUCKET_PASSWORD")
+	baseurl := os.Getenv("BITBUCKET_API_BASE_URL")
 
 	// Get connection config for plugin
 	bitbucketConfig := GetConfig(d.Connection)
@@ -24,6 +25,9 @@ func connect(ctx context.Context, d *plugin.QueryData) *bitbucket.Client {
 	}
 	if bitbucketConfig.Password != nil {
 		password = *bitbucketConfig.Password
+	}
+	if bitbucketConfig.BaseUrl != nil {
+		baseurl = *bitbucketConfig.BaseUrl
 	}
 
 	if username == "" {
@@ -34,6 +38,11 @@ func connect(ctx context.Context, d *plugin.QueryData) *bitbucket.Client {
 	}
 
 	client := bitbucket.NewBasicAuth(username, password)
+
+	// For private bitbucket setup
+	if baseurl != "" {
+		client.SetApiBaseURL(baseurl)
+	}
 	return client
 }
 

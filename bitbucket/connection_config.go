@@ -8,6 +8,7 @@ import (
 type githubConfig struct {
 	Username *string `cty:"username"`
 	Password *string `cty:"password"`
+	BaseUrl  *string `cty:"base_url"`
 }
 
 var ConfigSchema = map[string]*schema.Attribute{
@@ -15,6 +16,9 @@ var ConfigSchema = map[string]*schema.Attribute{
 		Type: schema.TypeString,
 	},
 	"password": {
+		Type: schema.TypeString,
+	},
+	"base_url": {
 		Type: schema.TypeString,
 	},
 }
