@@ -61,7 +61,7 @@ func tableBitBucketWorkspaceMember(_ context.Context) *plugin.Table {
 	}
 }
 
-func tableBitbucketWorkspaceMemberList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func tableBitbucketWorkspaceMemberList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Trace("tableBitbucketWorkspaceMemberList")
 
 	workspaceSlug := d.KeyColumnQuals["workspace_slug"].GetStringValue()

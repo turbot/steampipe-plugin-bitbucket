@@ -47,7 +47,7 @@ func tableBitBucketWorkspace(_ context.Context) *plugin.Table {
 	}
 }
 
-func tableBitbucketWorkspaceList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func tableBitbucketWorkspaceList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Trace("tableBitbucketWorkspaceList")
 	client := connect(ctx, d)
 
