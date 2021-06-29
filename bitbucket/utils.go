@@ -81,3 +81,7 @@ func decodeJson(response interface{}, respObject interface{}) error {
 	}
 	return nil
 }
+
+func isNotFoundError(err error) bool {
+	return strings.Contains(err.Error(), "404")
+}

@@ -2,6 +2,8 @@ package bitbucket
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/ktrysmt/go-bitbucket"
@@ -13,10 +15,14 @@ import (
 func tableBitbucketIssue(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_issue",
-		Description: "A Bitbucket project. Projects are used by teams to organize repositories.",
+		Description: "Issues are used to track ideas, enhancements, tasks, or bugs for work on Bitbucket.",
 		List: &plugin.ListConfig{
 			KeyColumns: plugin.SingleColumn("repository_full_name"),
 			Hydrate:    tableBitbucketIssuesList,
+		},
+		Get: &plugin.GetConfig{
+			KeyColumns: plugin.AllColumns([]string{"repository_full_name", "id"}),
+			Hydrate:    tableBitbucketIssueGet,
 		},
 		Columns: []*plugin.Column{
 			// top fields
@@ -171,7 +177,53 @@ func tableBitbucketIssuesList(ctx context.Context, d *plugin.QueryData, _ *plugi
 	}
 
 	return nil, nil
+}
 
+func tableBitbucketIssueGet(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("tableBitbucketIssueGet")
+	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
+	issue_id := d.KeyColumnQuals["id"].GetInt64Value()
+
+	if repoFullName == "" {
+		return nil, nil
+	}
+	owner, repoName := parseRepoFullName(repoFullName)
+
+	if owner == "" || repoName == "" {
+		return nil, fmt.Errorf("repository_full_name should be in the format \"{workspace_slug}/{repo_slug}\"")
+	}
+
+	if issue_id == 0 {
+		return nil, nil
+	}
+	client := connect(ctx, d)
+
+	opts := &bitbucket.IssuesOptions{
+		Owner:    owner,
+		RepoSlug: repoName,
+		ID:       strconv.Itoa(int(issue_id)),
+	}
+
+	response, err := client.Repositories.Issues.Get(opts)
+	if err != nil {
+		if isNotFoundError(err) {
+			return nil, nil
+		}
+		plugin.Logger(ctx).Error("getEpic", "Error", err)
+		return nil, err
+	}
+
+	if response == nil {
+		return nil, nil
+	}
+
+	issue := new(Issue)
+	err = decodeJson(response, issue)
+	if err != nil {
+		return nil, err
+	}
+
+	return issue, nil
 }
 
 type IssueList struct {
