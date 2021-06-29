@@ -39,80 +39,102 @@ func tableBitbucketIssue(_ context.Context) *plugin.Table {
 			},
 			{
 				Name:        "state",
-				Description: "A usefule description for thr project.",
+				Description: "A current state of the issue. Can we one of new \"open\", \"resolved\",\"on hold\", \"invalid\", \"duplicate\", \"wontfix\" and \"closed\".",
+				Type:        proto.ColumnType_STRING,
+			},
+			{
+				Name:        "title",
+				Description: "The issue title.",
 				Type:        proto.ColumnType_STRING,
 			},
 
 			// other fields
 			{
-				Name:        "priority",
-				Description: "A usefule description for thr project.",
-				Type:        proto.ColumnType_STRING,
-			},
-			{
-				Name:        "kind",
-				Description: "A usefule description for thr project.",
-				Type:        proto.ColumnType_STRING,
-			},
-			{
-				Name:        "title",
-				Description: "A usefule description for thr project.",
-				Type:        proto.ColumnType_STRING,
-			},
-			{
-				Name:        "votes",
-				Description: "A usefule description for thr project.",
-				Type:        proto.ColumnType_INT,
-			},
-			{
-				Name:        "watches",
-				Description: "A usefule description for thr project.",
-				Type:        proto.ColumnType_INT,
-			},
-			{
-				Name:        "updated",
-				Description: "Timestamp when project was last updated.",
-				Type:        proto.ColumnType_TIMESTAMP,
-			},
-			{
-				Name:        "type",
-				Description: "Type of the Bitbucket resource.",
-				Type:        proto.ColumnType_STRING,
-			},
-			{
-				Name:        "edited",
-				Description: "Timestamp when project was last updated.",
-				Type:        proto.ColumnType_TIMESTAMP,
-			},
-			{
 				Name:        "assignee_display_name",
-				Description: "Display name of the owner of this project.",
+				Description: "Display name of the assignee of this issue.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Assignee.display_name"),
 			},
 			{
 				Name:        "assignee_uuid",
-				Description: "UUID of the owner of this project.",
+				Description: "UUID of the assignee of this issue.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Assignee.uuid"),
 			},
 			{
+				Name:        "edited",
+				Description: "Timestamp when project was last edited.",
+				Type:        proto.ColumnType_TIMESTAMP,
+			},
+			{
+				Name:        "kind",
+				Description: "The kind of the issue. Can be one of \"bug\", \"enhancement\", \"proposal\", and \"task\".",
+				Type:        proto.ColumnType_STRING,
+			},
+			{
+				Name:        "priority",
+				Description: "The priority of the issue. Can be one of \"trivial\", \"minor\", \"major\", \"critical\", and \"blocker\".",
+				Type:        proto.ColumnType_STRING,
+			},
+			{
 				Name:        "reporter_display_name",
-				Description: "Display name of the owner of this project.",
+				Description: "Display name of the user issue is reported.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Reporter.display_name"),
 			},
 			{
 				Name:        "reporter_uuid",
-				Description: "UUID of the owner of this project.",
+				Description: "UUID of the user issue is reported.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Reporter.uuid"),
 			},
 			{
 				Name:        "self_link",
-				Description: "A self link to this project.",
+				Description: "A self link to this issue.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Links.self.href"),
+			},
+			{
+				Name:        "type",
+				Description: "Type of the Bitbucket resource. It will be always \"issue\".",
+				Type:        proto.ColumnType_STRING,
+			},
+			{
+				Name:        "updated",
+				Description: "Timestamp when issue was last updated.",
+				Type:        proto.ColumnType_TIMESTAMP,
+			},
+			{
+				Name:        "votes",
+				Description: "Number of the upvotes on the issue.",
+				Type:        proto.ColumnType_INT,
+			},
+			{
+				Name:        "watches",
+				Description: "No of the watchers on the issue.",
+				Type:        proto.ColumnType_INT,
+			},
+
+			// json fields
+			{
+				Name:        "component",
+				Description: "Content object of the issue with the rendering type details.",
+				Type:        proto.ColumnType_JSON,
+			},
+			{
+				Name:        "content",
+				Description: "Version is a point in project or product timeline.",
+				Type:        proto.ColumnType_JSON,
+			},
+			{
+				Name:        "milestone",
+				Description: "A milestone is a subset of a version. It is a point that a development team works towards.",
+				Type:        proto.ColumnType_JSON,
+			},
+			{
+				Name:        "version",
+				Description: "Version is a point in project or product timeline.",
+				Type:        proto.ColumnType_JSON,
 			},
 		},
 	}
@@ -123,8 +145,6 @@ func tableBitbucketIssuesList(ctx context.Context, d *plugin.QueryData, _ *plugi
 	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
 	client := connect(ctx, d)
-
-	// urlStr := client.GetApiBaseURL() + fmt.Sprintf("/workspaces/%s/projects", workspace.Slug)
 
 	opts := &bitbucket.IssuesOptions{
 		Owner:    owner,
