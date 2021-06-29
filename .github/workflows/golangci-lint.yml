@@ -19,6 +19,8 @@ jobs:
 
       - name: Golang Formatter
         uses: sladyn98/auto-go-format@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # with:
         # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
         # version: v1.29
