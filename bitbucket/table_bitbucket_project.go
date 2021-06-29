@@ -12,7 +12,7 @@ import (
 )
 
 // https://developer.atlassian.com/bitbucket/api/2/reference/resource/workspaces/%7Bworkspace%7D/projects
-func tableBitBucketProject(_ context.Context) *plugin.Table {
+func tableBitbucketProject(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_project",
 		Description: "A Bitbucket project. Projects are used by teams to organize repositories.",
@@ -130,12 +130,7 @@ func tableBitbucketProjectList(ctx context.Context, d *plugin.QueryData, h *plug
 }
 
 type ProjectList struct {
-	Page     int       `json:"page,omitempty"`
-	Pagelen  int       `json:"pagelen,omitempty"`
-	MaxDepth int       `json:"maxDepth,omitempty"`
-	Size     int       `json:"size,omitempty"`
-	Next     string    `json:"next,omitempty"`
-	Previous string    `json:"previous,omitempty"`
+	ListResponse
 	Projects []Project `json:"values,omitempty"`
 }
 

@@ -85,3 +85,12 @@ func decodeJson(response interface{}, respObject interface{}) error {
 func isNotFoundError(err error) bool {
 	return strings.Contains(err.Error(), "404")
 }
+
+type ListResponse struct {
+	Page     int    `json:"page,omitempty"`
+	Pagelen  int    `json:"pagelen,omitempty"`
+	MaxDepth int    `json:"maxDepth,omitempty"`
+	Size     int    `json:"size,omitempty"`
+	Next     string `json:"next,omitempty"`
+	Previous string `json:"previous,omitempty"`
+}
