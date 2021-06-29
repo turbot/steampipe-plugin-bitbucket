@@ -22,7 +22,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"bitbucket_my_workspace":     tableBitbucketMyWorkspace(ctx),
 			"bitbucket_project":          tableBitbucketProject(ctx),
 			"bitbucket_repository":       tableBitbucketRepository(ctx),
-			"bitbucket_snippet":          tableBitbucketSnippet(ctx),
+			"bitbucket_pull_request":     tableBitbucketPullRequest(ctx),
 			"bitbucket_workspace_member": tableBitbucketWorkspaceMember(ctx),
 		},
 	}

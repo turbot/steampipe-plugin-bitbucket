@@ -12,23 +12,23 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
 
-func tableBitbucketIssue(_ context.Context) *plugin.Table {
+func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "bitbucket_issue",
+		Name:        "bitbucket_pull_request",
 		Description: "Issues are used to track ideas, enhancements, tasks, or bugs for work on Bitbucket.",
 		List: &plugin.ListConfig{
 			KeyColumns: plugin.SingleColumn("repository_full_name"),
-			Hydrate:    tableBitbucketIssuesList,
+			Hydrate:    tableBitbucketPullRequestList,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.AllColumns([]string{"repository_full_name", "id"}),
-			Hydrate:    tableBitbucketIssueGet,
+			Hydrate:    tableBitbucketPullRequestGet,
 		},
 		Columns: []*plugin.Column{
 			// top fields
 			{
 				Name:        "id",
-				Description: "The issues's immutable id.",
+				Description: "The pull request's immutable id.",
 				Type:        proto.ColumnType_INT,
 				Transform:   transform.FromGo(),
 			},
@@ -36,36 +36,48 @@ func tableBitbucketIssue(_ context.Context) *plugin.Table {
 				Name:        "repository_full_name",
 				Description: "The repository's full name.",
 				Type:        proto.ColumnType_STRING,
-				Transform:   transform.FromField("Repository.full_name"),
+				Transform:   transform.FromField("Destination.repository.full_name"),
 			},
 			{
 				Name:        "created",
-				Description: "Timestamp when issue was created.",
+				Description: "Timestamp when pull request was created.",
 				Type:        proto.ColumnType_TIMESTAMP,
 			},
 			{
 				Name:        "state",
-				Description: "A current state of the issue. Can we one of new \"open\", \"resolved\",\"on hold\", \"invalid\", \"duplicate\", \"wontfix\" and \"closed\".",
+				Description: "A current state of the pull request.",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "title",
-				Description: "The issue title.",
+				Description: "The title of pull request.",
 				Type:        proto.ColumnType_STRING,
 			},
 
 			// other fields
 			{
-				Name:        "assignee_display_name",
-				Description: "Display name of the assignee of this issue.",
+				Name:        "author_display_name",
+				Description: "Display name of the author of this pull request.",
 				Type:        proto.ColumnType_STRING,
-				Transform:   transform.FromField("Assignee.display_name"),
+				Transform:   transform.FromField("Author.display_name"),
 			},
 			{
-				Name:        "assignee_uuid",
-				Description: "UUID of the assignee of this issue.",
+				Name:        "author_uuid",
+				Description: "UUID of the author of this pull request.",
 				Type:        proto.ColumnType_STRING,
-				Transform:   transform.FromField("Assignee.uuid"),
+				Transform:   transform.FromField("Author.uuid"),
+			},
+			{
+				Name:        "closed_by_display_name",
+				Description: "Display name of the user who closed this pull request.",
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("ClosedBy.display_name"),
+			},
+			{
+				Name:        "closed_by_uuid",
+				Description: "UUID of the user who closed of this pull request.",
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("ClosedBy.uuid"),
 			},
 			{
 				Name:        "edited",
@@ -73,20 +85,20 @@ func tableBitbucketIssue(_ context.Context) *plugin.Table {
 				Type:        proto.ColumnType_TIMESTAMP,
 			},
 			{
-				Name:        "kind",
-				Description: "The kind of the issue. Can be one of \"bug\", \"enhancement\", \"proposal\", and \"task\".",
-				Type:        proto.ColumnType_STRING,
+				Name:        "close_source_branch",
+				Description: "",
+				Type:        proto.ColumnType_BOOL,
 			},
 			{
-				Name:        "priority",
+				Name:        "comment_count",
 				Description: "The priority of the issue. Can be one of \"trivial\", \"minor\", \"major\", \"critical\", and \"blocker\".",
-				Type:        proto.ColumnType_STRING,
+				Type:        proto.ColumnType_INT,
 			},
 			{
-				Name:        "reporter_display_name",
+				Name:        "description",
 				Description: "Display name of the user issue is reported.",
 				Type:        proto.ColumnType_STRING,
-				Transform:   transform.FromField("Reporter.display_name"),
+				Transform:   transform.FromField("Description"),
 			},
 			{
 				Name:        "reporter_uuid",
@@ -111,53 +123,43 @@ func tableBitbucketIssue(_ context.Context) *plugin.Table {
 				Type:        proto.ColumnType_TIMESTAMP,
 			},
 			{
-				Name:        "votes",
-				Description: "Number of the upvotes on the issue.",
-				Type:        proto.ColumnType_INT,
-			},
-			{
-				Name:        "watches",
+				Name:        "reason",
 				Description: "No of the watchers on the issue.",
-				Type:        proto.ColumnType_INT,
+				Type:        proto.ColumnType_STRING,
 			},
 
 			// json fields
 			{
-				Name:        "component",
-				Description: "Content object of the issue with the rendering type details.",
+				Name:        "merge_commit",
+				Description: "",
 				Type:        proto.ColumnType_JSON,
 			},
 			{
-				Name:        "content",
-				Description: "Version is a point in project or product timeline.",
+				Name:        "source",
+				Description: "",
 				Type:        proto.ColumnType_JSON,
 			},
 			{
-				Name:        "milestone",
-				Description: "A milestone is a subset of a version. It is a point that a development team works towards.",
-				Type:        proto.ColumnType_JSON,
-			},
-			{
-				Name:        "version",
-				Description: "Version is a point in project or product timeline.",
+				Name:        "summary",
+				Description: "",
 				Type:        proto.ColumnType_JSON,
 			},
 		},
 	}
 }
 
-func tableBitbucketIssuesList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	plugin.Logger(ctx).Trace("tableBitbucketIssuesList")
+func tableBitbucketPullRequestList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("tableBitbucketPullRequestList")
 	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
 	client := connect(ctx, d)
 
-	opts := &bitbucket.IssuesOptions{
+	opts := &bitbucket.PullRequestsOptions{
 		Owner:    owner,
 		RepoSlug: repoName,
 	}
 
-	response, err := client.Repositories.Issues.Gets(opts)
+	response, err := client.Repositories.PullRequests.Gets(opts)
 	if err != nil {
 		return nil, err
 	}
@@ -166,21 +168,21 @@ func tableBitbucketIssuesList(ctx context.Context, d *plugin.QueryData, _ *plugi
 		return nil, nil
 	}
 
-	issueList := new(IssueList)
-	err = decodeJson(response, issueList)
+	pullRequestList := new(PullRequestList)
+	err = decodeJson(response, pullRequestList)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, issue := range issueList.Issues {
+	for _, issue := range pullRequestList.PullRequests {
 		d.StreamListItem(ctx, issue)
 	}
 
 	return nil, nil
 }
 
-func tableBitbucketIssueGet(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	plugin.Logger(ctx).Trace("tableBitbucketIssueGet")
+func tableBitbucketPullRequestGet(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("tableBitbucketPullRequestGet")
 	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
 	issue_id := d.KeyColumnQuals["id"].GetInt64Value()
 
@@ -226,31 +228,28 @@ func tableBitbucketIssueGet(ctx context.Context, d *plugin.QueryData, _ *plugin.
 	return issue, nil
 }
 
-type IssueList struct {
+type PullRequestList struct {
 	ListResponse
-	Issues []Issue `json:"values,omitempty"`
+	PullRequests []PullRequest `json:"values,omitempty"`
 }
 
-type Issue struct {
-	Assignee   map[string]interface{} `json:"assignee,omitempty"`
-	Component  map[string]interface{} `json:"component,omitempty"`
-	Content    map[string]interface{} `json:"content,omitempty"`
-	Created    *time.Time             `json:"created_on,omitempty"`
-	Edited     *time.Time             `json:"edited_on,omitempty"`
-	ID         int                    `json:"id,omitempty"`
-	Kind       string                 `json:"kind,omitempty"`
-	Links      map[string]interface{} `json:"links,omitempty"`
-	Milestone  map[string]interface{} `json:"milestone,omitempty"`
-	Name       string                 `json:"name,omitempty"`
-	Priority   string                 `json:"priority,omitempty"`
-	Reporter   map[string]interface{} `json:"reporter,omitempty"`
-	Repository map[string]interface{} `json:"repository,omitempty"`
-	State      string                 `json:"state,omitempty"`
-	Title      string                 `json:"title,omitempty"`
-	Type       string                 `json:"type,omitempty"`
-	Updated    *time.Time             `json:"updated_on,omitempty"`
-	Version    map[string]interface{} `json:"version,omitempty"`
-	Votes      int                    `json:"votes,omitempty"`
-	Watches    int                    `json:"watches,omitempty"`
-	Workspace  bitbucket.Workspace    `json:"workspace,omitempty"`
+type PullRequest struct {
+	Author            map[string]interface{} `json:"author,omitempty"`
+	CloseSourceBranch bool                   `json:"close_source_branch,omitempty"`
+	ClosedBy          map[string]interface{} `json:"closed_by,omitempty"`
+	CommentCount      int                    `json:"comment_count,omitempty"`
+	Created           *time.Time             `json:"created_on,omitempty"`
+	Description       string                 `json:"description,omitempty"`
+	Destination       map[string]interface{} `json:"destination,omitempty"`
+	ID                int                    `json:"id,omitempty"`
+	Links             map[string]interface{} `json:"links,omitempty"`
+	MergeCommit       map[string]interface{} `json:"merge_commit,omitempty"`
+	Reason            string                 `json:"reason,omitempty"`
+	Source            map[string]interface{} `json:"source,omitempty"`
+	State             string                 `json:"state,omitempty"`
+	Summary           map[string]interface{} `json:"summary,omitempty"`
+	TaskCount         int                    `json:"task_count,omitempty"`
+	Title             string                 `json:"title,omitempty"`
+	Type              string                 `json:"type,omitempty"`
+	Updated           *time.Time             `json:"updated_on,omitempty"`
 }
