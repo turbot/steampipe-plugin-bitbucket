@@ -69,7 +69,7 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 		},
 		{
 			Name:        "description",
-			Description: "Description",
+			Description: "Description of the repository.",
 			Type:        proto.ColumnType_STRING,
 		},
 		{

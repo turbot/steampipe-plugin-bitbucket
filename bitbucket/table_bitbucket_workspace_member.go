@@ -10,7 +10,6 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
 
-// https://developer.atlassian.com/bitbucket/api/2/reference/resource/workspaces/%7Bworkspace%7D/members
 func tableBitbucketWorkspaceMember(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_workspace_member",
