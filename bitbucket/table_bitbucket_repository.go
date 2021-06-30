@@ -12,7 +12,7 @@ import (
 func tableBitbucketRepository(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_repository",
-		Description: "BitBucket repositories that you are associated with. BitBucket repositories contain all of your project's files and each file's revision history.",
+		Description: "BitBucket repositorie that you are associated with. BitBucket repositories contain all of your project's files and each file's revision history.",
 		List: &plugin.ListConfig{
 			KeyColumns: plugin.SingleColumn("full_name"),
 			Hydrate:    tableBitbucketRepositoryList,
@@ -119,6 +119,24 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Transform:   transform.FromField("Owner.uuid"),
 		},
 		{
+			Name:        "project_name",
+			Description: "Name of the project this repository belongs to.",
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Project.Name"),
+		},
+		{
+			Name:        "project_key",
+			Description: "Key of the project this repository belongs to.",
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Project.Key"),
+		},
+		{
+			Name:        "project_uuid",
+			Description: "UUID of the project this repository belongs to.",
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Project.Uuid"),
+		},
+		{
 			Name:        "self_link",
 			Description: "Self link to this repository.",
 			Type:        proto.ColumnType_STRING,
@@ -127,16 +145,6 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 		{
 			Name:        "mainbranch",
 			Description: "Details of the main branch of the repository.",
-			Type:        proto.ColumnType_JSON,
-		},
-		{
-			Name:        "parent",
-			Description: "Details of the parent for repository.",
-			Type:        proto.ColumnType_JSON,
-		},
-		{
-			Name:        "project",
-			Description: "Details of the project associated with the repository.",
 			Type:        proto.ColumnType_JSON,
 		},
 	}
