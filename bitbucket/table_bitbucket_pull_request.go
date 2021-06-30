@@ -28,7 +28,7 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 			// top fields
 			{
 				Name:        "id",
-				Description: "The pull request's immutable id.",
+				Description: "The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.",
 				Type:        proto.ColumnType_INT,
 				Transform:   transform.FromGo(),
 			},
@@ -50,7 +50,7 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 			},
 			{
 				Name:        "title",
-				Description: "The title of pull request.",
+				Description: "Title of the pull request.",
 				Type:        proto.ColumnType_STRING,
 			},
 
@@ -75,7 +75,7 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 			},
 			{
 				Name:        "comment_count",
-				Description: "The no of comments on the pull request.",
+				Description: "The number of comments for a specific pull request.",
 				Type:        proto.ColumnType_INT,
 			},
 			{
@@ -92,7 +92,7 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 			},
 			{
 				Name:        "close_source_branch",
-				Description: "Indicates if the source branch should be deleted after pull request is merged.",
+				Description: "A boolean flag indicating if merging the pull request closes the source branch.",
 				Type:        proto.ColumnType_BOOL,
 			},
 			{
@@ -113,12 +113,6 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Transform:   transform.FromField("MergeCommit.hash"),
 			},
 			{
-				Name:        "reason",
-				Description: "The reason details for the pull request.",
-				Type:        proto.ColumnType_JSON,
-				Transform:   transform.FromField("Reason.raw"),
-			},
-			{
 				Name:        "summary",
 				Description: "Summary details of the pull request.",
 				Type:        proto.ColumnType_STRING,
@@ -129,6 +123,11 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Description: "A self link to this pull request.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Links.self.href"),
+			},
+			{
+				Name:        "task_count",
+				Description: "The number of open tasks for a specific pull request.",
+				Type:        proto.ColumnType_INT,
 			},
 			{
 				Name:        "type",
@@ -240,7 +239,6 @@ type PullRequest struct {
 	ID                int                    `json:"id,omitempty"`
 	Links             map[string]interface{} `json:"links,omitempty"`
 	MergeCommit       map[string]interface{} `json:"merge_commit,omitempty"`
-	Reason            map[string]interface{} `json:"reason,omitempty"`
 	Source            map[string]interface{} `json:"source,omitempty"`
 	State             string                 `json:"state,omitempty"`
 	Summary           map[string]interface{} `json:"summary,omitempty"`
