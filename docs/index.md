@@ -5,7 +5,7 @@ icon_url: "/images/plugins/turbot/bitbucket.svg"
 brand_color: "#2684FF"
 display_name: "Bitbucket"
 short_name: "bitbucket"
-description: "Steampipe plugin for querying sprints, issues, epics and more from Bitbucket."
+description: "Steampipe plugin for querying repositories, issues, pull requests and more from Bitbucket."
 og_description: "Query Bitbucket with SQL! Open source CLI. No DB required."
 og_image: "/images/plugins/turbot/bitbucket-social-graphic.png"
 ---
