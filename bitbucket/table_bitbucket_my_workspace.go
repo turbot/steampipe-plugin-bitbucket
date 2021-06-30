@@ -8,9 +8,9 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
 
-func tableBitBucketWorkspace(_ context.Context) *plugin.Table {
+func tableBitbucketMyWorkspace(_ context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "bitbucket_workspace",
+		Name:        "bitbucket_my_workspace",
 		Description: "Workspace is where you will create repositories, collaborate on your code, and organize different streams of work in your Bitbucket Cloud account.",
 		List: &plugin.ListConfig{
 			Hydrate: tableBitbucketWorkspaceList,

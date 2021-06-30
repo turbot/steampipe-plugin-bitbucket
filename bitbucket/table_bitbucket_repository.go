@@ -9,7 +9,7 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
 
-func tableBitBucketRepository(_ context.Context) *plugin.Table {
+func tableBitbucketRepository(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_repository",
 		Description: "BitBucket repositories that you are associated with. BitBucket repositories contain all of your project's files and each file's revision history.",

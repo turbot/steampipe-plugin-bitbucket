@@ -34,7 +34,7 @@ func tableBitbucketIssue(_ context.Context) *plugin.Table {
 			},
 			{
 				Name:        "repository_full_name",
-				Description: "The project's immutable id.",
+				Description: "The repository's full name.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Repository.full_name"),
 			},
@@ -227,13 +227,8 @@ func tableBitbucketIssueGet(ctx context.Context, d *plugin.QueryData, _ *plugin.
 }
 
 type IssueList struct {
-	Page     int     `json:"page,omitempty"`
-	Pagelen  int     `json:"pagelen,omitempty"`
-	MaxDepth int     `json:"maxDepth,omitempty"`
-	Size     int     `json:"size,omitempty"`
-	Next     string  `json:"next,omitempty"`
-	Previous string  `json:"previous,omitempty"`
-	Issues   []Issue `json:"values,omitempty"`
+	ListResponse
+	Issues []Issue `json:"values,omitempty"`
 }
 
 type Issue struct {

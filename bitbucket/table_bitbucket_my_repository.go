@@ -7,7 +7,7 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
 )
 
-func tableBitBucketMyRepository(_ context.Context) *plugin.Table {
+func tableBitbucketMyRepository(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_my_repository",
 		Description: "BitBucket repositories that you are associated with. BitBucket Repositories contain all of your project's files and each file's revision history.",
