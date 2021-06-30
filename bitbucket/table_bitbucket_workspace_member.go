@@ -10,11 +10,10 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
 
-// https://developer.atlassian.com/bitbucket/api/2/reference/resource/workspaces/%7Bworkspace%7D/members
 func tableBitbucketWorkspaceMember(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_workspace_member",
-		Description: "A Bitbucket project. Projects are used by teams to organize repositories.",
+		Description: "Bitbucket workspace members are bitbucket users having access to the workspace.",
 		List: &plugin.ListConfig{
 			KeyColumns: plugin.SingleColumn("workspace_slug"),
 			Hydrate:    tableBitbucketWorkspaceMemberList,

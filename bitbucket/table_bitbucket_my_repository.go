@@ -12,17 +12,19 @@ func tableBitbucketMyRepository(_ context.Context) *plugin.Table {
 		Name:        "bitbucket_my_repository",
 		Description: "BitBucket repositories that you are associated with. BitBucket Repositories contain all of your project's files and each file's revision history.",
 		List: &plugin.ListConfig{
-			Hydrate: tableBitbucketMyRepositoryList,
+			ParentHydrate: tableBitbucketWorkspaceList,
+			Hydrate:       tableBitbucketMyRepositoryList,
 		},
 		Columns: bitBucketRepositoryColumns(),
 	}
 }
 
-func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	owner := h.Item.(bitbucket.Workspace).Slug
 	client := connect(ctx, d)
 
 	repos, err := client.Repositories.ListForAccount(&bitbucket.RepositoriesOptions{
-		Owner: "LalitFort",
+		Owner: owner,
 	})
 
 	if err != nil {

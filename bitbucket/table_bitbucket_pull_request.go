@@ -45,7 +45,7 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 			},
 			{
 				Name:        "state",
-				Description: "A current state of the pull request. Can be one of \"merged\", \"superseded\", \"open\" and \"declined\".",
+				Description: "A current state of the pull request. Can be one of \"MERGED\", \"SUPERSEDED\", \"OPEN\" and \"DECLINED\".",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
@@ -139,6 +139,18 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Description: "Timestamp when pull request was last updated.",
 				Type:        proto.ColumnType_TIMESTAMP,
 			},
+			{
+				Name:        "participants",
+				Description: "List of collaborators on the pull request.",
+				Type:        proto.ColumnType_JSON,
+				Hydrate:     tableBitbucketPullRequestGet,
+			},
+			{
+				Name:        "reviewers",
+				Description: "List of reviewers of the pull request.",
+				Type:        proto.ColumnType_JSON,
+				Hydrate:     tableBitbucketPullRequestGet,
+			},
 		},
 	}
 }
@@ -152,6 +164,7 @@ func tableBitbucketPullRequestList(ctx context.Context, d *plugin.QueryData, _ *
 	opts := &bitbucket.PullRequestsOptions{
 		Owner:    owner,
 		RepoSlug: repoName,
+		States:   []string{"merged", "open", "superseded", "declined"},
 	}
 
 	response, err := client.Repositories.PullRequests.Gets(opts)
@@ -176,10 +189,19 @@ func tableBitbucketPullRequestList(ctx context.Context, d *plugin.QueryData, _ *
 	return nil, nil
 }
 
-func tableBitbucketPullRequestGet(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func tableBitbucketPullRequestGet(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Trace("tableBitbucketPullRequestGet")
-	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
-	issue_id := d.KeyColumnQuals["id"].GetInt64Value()
+
+	var repoFullName string
+	var issue_id int64
+
+	if h.Item != nil {
+		repoFullName = (h.Item.(PullRequest).Destination["repository"]).(map[string]interface{})["full_name"].(string)
+		issue_id = int64(h.Item.(PullRequest).ID)
+	} else {
+		repoFullName = d.KeyColumnQuals["repository_full_name"].GetStringValue()
+		issue_id = d.KeyColumnQuals["id"].GetInt64Value()
+	}
 
 	if repoFullName == "" {
 		return nil, nil
@@ -229,21 +251,23 @@ type PullRequestList struct {
 }
 
 type PullRequest struct {
-	Author            map[string]interface{} `json:"author,omitempty"`
-	CloseSourceBranch bool                   `json:"close_source_branch,omitempty"`
-	ClosedBy          map[string]interface{} `json:"closed_by,omitempty"`
-	CommentCount      int                    `json:"comment_count,omitempty"`
-	Created           *time.Time             `json:"created_on,omitempty"`
-	Description       string                 `json:"description,omitempty"`
-	Destination       map[string]interface{} `json:"destination,omitempty"`
-	ID                int                    `json:"id,omitempty"`
-	Links             map[string]interface{} `json:"links,omitempty"`
-	MergeCommit       map[string]interface{} `json:"merge_commit,omitempty"`
-	Source            map[string]interface{} `json:"source,omitempty"`
-	State             string                 `json:"state,omitempty"`
-	Summary           map[string]interface{} `json:"summary,omitempty"`
-	TaskCount         int                    `json:"task_count,omitempty"`
-	Title             string                 `json:"title,omitempty"`
-	Type              string                 `json:"type,omitempty"`
-	Updated           *time.Time             `json:"updated_on,omitempty"`
+	Author            map[string]interface{}   `json:"author,omitempty"`
+	CloseSourceBranch bool                     `json:"close_source_branch,omitempty"`
+	ClosedBy          map[string]interface{}   `json:"closed_by,omitempty"`
+	CommentCount      int                      `json:"comment_count,omitempty"`
+	Created           *time.Time               `json:"created_on,omitempty"`
+	Description       string                   `json:"description,omitempty"`
+	Destination       map[string]interface{}   `json:"destination,omitempty"`
+	ID                int                      `json:"id,omitempty"`
+	Links             map[string]interface{}   `json:"links,omitempty"`
+	MergeCommit       map[string]interface{}   `json:"merge_commit,omitempty"`
+	Source            map[string]interface{}   `json:"source,omitempty"`
+	Reviewers         []map[string]interface{} `json:"reviewers,omitempty"`
+	Participants      []map[string]interface{} `json:"participants,omitempty"`
+	State             string                   `json:"state,omitempty"`
+	Summary           map[string]interface{}   `json:"summary,omitempty"`
+	TaskCount         int                      `json:"task_count,omitempty"`
+	Title             string                   `json:"title,omitempty"`
+	Type              string                   `json:"type,omitempty"`
+	Updated           *time.Time               `json:"updated_on,omitempty"`
 }

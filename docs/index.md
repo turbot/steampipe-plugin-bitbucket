@@ -53,10 +53,10 @@ steampipe plugin install bitbucket
 
 ### Credentials
 
-| Item        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Credentials | Bitbucket requires an [app password](https://bitbucket.org/account/settings/app-passwords/), bitbucket instance baseurl (If private setup) and username for all requests.                                                                                                                                                                                                                                                                                                           |
-| Permissions | You must create app password with the following scopes:<br />&nbsp;&nbsp;&nbsp;&nbsp;- `workspace:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `account:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `read:user`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `snippet:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `wiki:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `repository:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `user:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `pullrequest:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `issue:read` |
+| Item        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| :---------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Credentials | Bitbucket requires an [app password](https://bitbucket.org/account/settings/app-passwords/), bitbucket instance baseurl (If private setup) and username for all requests.                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Permissions | You must create app password with the following [scopes](https://developer.atlassian.com/bitbucket/api/2/reference/meta/authentication#scopes-bbc):<br />&nbsp;&nbsp;&nbsp;&nbsp;- `workspace:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `account:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `snippet:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `wiki:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `repository:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `user:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `pullrequest:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `issue:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `webhook:read` |
 
 ### Configuration
 
@@ -71,7 +71,7 @@ connection "bitbucket" {
 ```
 
 - `base_url` - The url of your bitbucket private instance.
-- `username` - Email address of agent user who have permission to access the API.
+- `username` - Bitbucket username.
 - `password` - [App password](https://bitbucket.org/account/settings/app-passwords/) for bitbucket account.
 
 ## Get involved
