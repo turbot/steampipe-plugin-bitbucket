@@ -14,7 +14,7 @@ import (
 func tableBitbucketWorkspaceMember(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_workspace_member",
-		Description: "A Bitbucket project. Projects are used by teams to organize repositories.",
+		Description: "Bitbucket workspace members are bitbucket users having access to the workspace.",
 		List: &plugin.ListConfig{
 			KeyColumns: plugin.SingleColumn("workspace_slug"),
 			Hydrate:    tableBitbucketWorkspaceMemberList,
