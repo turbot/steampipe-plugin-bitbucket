@@ -45,7 +45,7 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 			},
 			{
 				Name:        "state",
-				Description: "A current state of the pull request.",
+				Description: "A current state of the pull request. Can be one of \"merged\", \"superseded\", \"open\" and \"declined\".",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
@@ -68,6 +68,17 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Transform:   transform.FromField("Author.uuid"),
 			},
 			{
+				Name:        "branch_name",
+				Description: "Name of the source branch for the pull request.",
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("Source.branch.name"),
+			},
+			{
+				Name:        "comment_count",
+				Description: "The no of comments on the pull request.",
+				Type:        proto.ColumnType_INT,
+			},
+			{
 				Name:        "closed_by_display_name",
 				Description: "Display name of the user who closed this pull request.",
 				Type:        proto.ColumnType_STRING,
@@ -80,69 +91,54 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Transform:   transform.FromField("ClosedBy.uuid"),
 			},
 			{
-				Name:        "edited",
-				Description: "Timestamp when project was last edited.",
-				Type:        proto.ColumnType_TIMESTAMP,
-			},
-			{
 				Name:        "close_source_branch",
-				Description: "",
+				Description: "Indicates if the source branch should be deleted after pull request is merged.",
 				Type:        proto.ColumnType_BOOL,
 			},
 			{
-				Name:        "comment_count",
-				Description: "The priority of the issue. Can be one of \"trivial\", \"minor\", \"major\", \"critical\", and \"blocker\".",
-				Type:        proto.ColumnType_INT,
-			},
-			{
 				Name:        "description",
-				Description: "Display name of the user issue is reported.",
+				Description: "Description of the pull request.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Description"),
 			},
 			{
-				Name:        "reporter_uuid",
-				Description: "UUID of the user issue is reported.",
+				Name:        "edited",
+				Description: "Timestamp when pull request was last edited.",
+				Type:        proto.ColumnType_TIMESTAMP,
+			},
+			{
+				Name:        "merge_commit",
+				Description: "Merge commit hash details for pull request.",
 				Type:        proto.ColumnType_STRING,
-				Transform:   transform.FromField("Reporter.uuid"),
+				Transform:   transform.FromField("MergeCommit.hash"),
+			},
+			{
+				Name:        "reason",
+				Description: "The reason details for the pull request.",
+				Type:        proto.ColumnType_JSON,
+				Transform:   transform.FromField("Reason.raw"),
+			},
+			{
+				Name:        "summary",
+				Description: "Summary details of the pull request.",
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("Summary.raw"),
 			},
 			{
 				Name:        "self_link",
-				Description: "A self link to this issue.",
+				Description: "A self link to this pull request.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Links.self.href"),
 			},
 			{
 				Name:        "type",
-				Description: "Type of the Bitbucket resource. It will be always \"issue\".",
+				Description: "Type of the Bitbucket resource. It will be always \"pullrequest\".",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "updated",
-				Description: "Timestamp when issue was last updated.",
+				Description: "Timestamp when pull request was last updated.",
 				Type:        proto.ColumnType_TIMESTAMP,
-			},
-			{
-				Name:        "reason",
-				Description: "No of the watchers on the issue.",
-				Type:        proto.ColumnType_STRING,
-			},
-
-			// json fields
-			{
-				Name:        "merge_commit",
-				Description: "",
-				Type:        proto.ColumnType_JSON,
-			},
-			{
-				Name:        "source",
-				Description: "",
-				Type:        proto.ColumnType_JSON,
-			},
-			{
-				Name:        "summary",
-				Description: "",
-				Type:        proto.ColumnType_JSON,
 			},
 		},
 	}
@@ -200,18 +196,18 @@ func tableBitbucketPullRequestGet(ctx context.Context, d *plugin.QueryData, _ *p
 	}
 	client := connect(ctx, d)
 
-	opts := &bitbucket.IssuesOptions{
+	opts := &bitbucket.PullRequestsOptions{
 		Owner:    owner,
 		RepoSlug: repoName,
 		ID:       strconv.Itoa(int(issue_id)),
 	}
 
-	response, err := client.Repositories.Issues.Get(opts)
+	response, err := client.Repositories.PullRequests.Get(opts)
 	if err != nil {
 		if isNotFoundError(err) {
 			return nil, nil
 		}
-		plugin.Logger(ctx).Error("getEpic", "Error", err)
+		plugin.Logger(ctx).Error("tableBitbucketPullRequestGet", "Error", err)
 		return nil, err
 	}
 
@@ -219,13 +215,13 @@ func tableBitbucketPullRequestGet(ctx context.Context, d *plugin.QueryData, _ *p
 		return nil, nil
 	}
 
-	issue := new(Issue)
-	err = decodeJson(response, issue)
+	pullRequest := new(PullRequest)
+	err = decodeJson(response, pullRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	return issue, nil
+	return pullRequest, nil
 }
 
 type PullRequestList struct {
@@ -244,7 +240,7 @@ type PullRequest struct {
 	ID                int                    `json:"id,omitempty"`
 	Links             map[string]interface{} `json:"links,omitempty"`
 	MergeCommit       map[string]interface{} `json:"merge_commit,omitempty"`
-	Reason            string                 `json:"reason,omitempty"`
+	Reason            map[string]interface{} `json:"reason,omitempty"`
 	Source            map[string]interface{} `json:"source,omitempty"`
 	State             string                 `json:"state,omitempty"`
 	Summary           map[string]interface{} `json:"summary,omitempty"`
