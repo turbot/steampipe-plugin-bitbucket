@@ -8,10 +8,6 @@ To list all the **your** repositories use the `bitbucket_my_repository` table in
 
 ## Examples
 
-### List of repositories that you or your workspace owns
-
-## Examples
-
 ### Get information about a specific repository
 
 ```sql
