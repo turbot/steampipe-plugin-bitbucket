@@ -12,9 +12,9 @@ import (
 )
 
 // https://developer.atlassian.com/bitbucket/api/2/reference/resource/workspaces/%7Bworkspace%7D/projects
-func tableBitbucketProject(_ context.Context) *plugin.Table {
+func tableBitbucketMyProject(_ context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "bitbucket_project",
+		Name:        "bitbucket_my_project",
 		Description: "A Bitbucket project. Projects are used by teams to organize repositories.",
 		List: &plugin.ListConfig{
 			ParentHydrate: tableBitbucketWorkspaceList,
