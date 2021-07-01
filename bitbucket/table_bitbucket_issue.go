@@ -48,11 +48,6 @@ func tableBitbucketIssue(_ context.Context) *plugin.Table {
 				Description: "A current state of the issue. Can we one of \"new\", \"open\", \"resolved\",\"on hold\", \"invalid\", \"duplicate\", \"wontfix\" and \"closed\".",
 				Type:        proto.ColumnType_STRING,
 			},
-			{
-				Name:        "title",
-				Description: "The issue title.",
-				Type:        proto.ColumnType_STRING,
-			},
 
 			// other fields
 			{
@@ -141,6 +136,13 @@ func tableBitbucketIssue(_ context.Context) *plugin.Table {
 				Name:        "version",
 				Description: "Version is a point in project or product timeline.",
 				Type:        proto.ColumnType_JSON,
+			},
+
+			// Standard columns
+			{
+				Name:        "title",
+				Description: ColumnDescriptionTitle,
+				Type:        proto.ColumnType_STRING,
 			},
 		},
 	}

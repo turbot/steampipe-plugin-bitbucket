@@ -12,6 +12,13 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
 )
 
+//// Constants
+const (
+	ColumnDescriptionTitle = "Title of the resource."
+)
+
+//// HELPER FUNCTIONS
+
 // create service client
 func connect(_ context.Context, d *plugin.QueryData) *bitbucket.Client {
 	username := os.Getenv("BITBUCKET_USERNAME")
@@ -45,8 +52,6 @@ func connect(_ context.Context, d *plugin.QueryData) *bitbucket.Client {
 	}
 	return client
 }
-
-//// HELPER FUNCTIONS
 
 func parseRepoFullName(fullName string) (string, string) {
 	owner := ""

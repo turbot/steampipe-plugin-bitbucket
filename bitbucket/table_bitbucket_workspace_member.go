@@ -56,6 +56,14 @@ func tableBitbucketWorkspaceMember(_ context.Context) *plugin.Table {
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Workspace.Slug"),
 			},
+
+			// Standard columns
+			{
+				Name:        "title",
+				Description: ColumnDescriptionTitle,
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("User.DisplayName"),
+			},
 		},
 	}
 }
