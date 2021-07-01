@@ -1,6 +1,6 @@
 ---
 organization: Turbot
-category: ["public cloud"]
+category: ["software development"]
 icon_url: "/images/plugins/turbot/bitbucket.svg"
 brand_color: "#2684FF"
 display_name: "Bitbucket"
