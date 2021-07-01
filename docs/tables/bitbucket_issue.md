@@ -19,7 +19,7 @@ select
 from
   bitbucket_issue
 where
-  repository_full_name = 'LalitFort/steampipe-plugin-bitbucket';
+  repository_full_name = 'gamesaucer/mono-ui';
 ```
 
 ### List the unassigned open issues in a repository
@@ -37,7 +37,7 @@ from
 where
   repository_full_name = 'LalitFort/steampipe-plugin-bitbucket'
   and assignee_uuid is null
-  and state = 'new';
+  and state in ('new','open');
 ```
 
 ### List the open issues in a repository assigned to a specific user
@@ -74,4 +74,23 @@ group by
   assignee_display_name
 order by
   num_issues desc;
+```
+
+### List the unassigned open issues in your repositories
+
+```sql
+select
+  repository_full_name,
+  id,
+  title,
+  state,
+  assignee_display_name,
+  assignee_uuid
+from
+  bitbucket_issue,
+  bitbucket_my_repository as r
+where
+  repository_full_name = r.full_name
+  and assignee_uuid is null
+  and state in ('new', 'open');
 ```

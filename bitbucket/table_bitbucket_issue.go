@@ -45,7 +45,7 @@ func tableBitbucketIssue(_ context.Context) *plugin.Table {
 			},
 			{
 				Name:        "state",
-				Description: "A current state of the issue. Can we one of new \"open\", \"resolved\",\"on hold\", \"invalid\", \"duplicate\", \"wontfix\" and \"closed\".",
+				Description: "A current state of the issue. Can we one of \"new\", \"open\", \"resolved\",\"on hold\", \"invalid\", \"duplicate\", \"wontfix\" and \"closed\".",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
@@ -159,6 +159,10 @@ func tableBitbucketIssuesList(ctx context.Context, d *plugin.QueryData, _ *plugi
 
 	response, err := client.Repositories.Issues.Gets(opts)
 	if err != nil {
+		if isNotFoundError(err) {
+			return nil, nil
+		}
+		plugin.Logger(ctx).Error("tableBitbucketIssueGet", "Error", err)
 		return nil, err
 	}
 
@@ -209,7 +213,7 @@ func tableBitbucketIssueGet(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		if isNotFoundError(err) {
 			return nil, nil
 		}
-		plugin.Logger(ctx).Error("getEpic", "Error", err)
+		plugin.Logger(ctx).Error("tableBitbucketIssueGet", "Error", err)
 		return nil, err
 	}
 

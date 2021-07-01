@@ -1,6 +1,7 @@
 # Table: bitbucket_workspace_member
 
-The `bitbucket_workspace_member` table list all members of Workspace. The table will list only members of the worspace that **you have access too**.
+The `bitbucket_workspace_member` table list all members of Workspace. The table will list members only of the workspace that **you have required access to list members**.
+
 **Note:** This table requires `workspace_slug` as the required input.
 
 ## Examples

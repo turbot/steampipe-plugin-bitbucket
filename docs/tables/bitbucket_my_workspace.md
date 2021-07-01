@@ -6,7 +6,7 @@ The `bitbucket_my_workspace` table will list the workspaces **that you are a mem
 
 ## Examples
 
-### Basic info for the GitHub Workspaces to which you belong
+### Basic info for the Bitbucket workspaces to which you belong
 
 ```sql
 select
@@ -19,6 +19,8 @@ from
 ```
 
 ### Get members details for workspaces you belong
+
+**Note:** Members will be listed for a workspace only if you have access to list them.
 
 ```sql
 select

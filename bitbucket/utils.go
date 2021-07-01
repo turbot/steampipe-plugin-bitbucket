@@ -82,8 +82,14 @@ func decodeJson(response interface{}, respObject interface{}) error {
 	return nil
 }
 
+// resource is not found error handling predicate
 func isNotFoundError(err error) bool {
 	return strings.Contains(err.Error(), "404")
+}
+
+// User don't have required access to all the api on resource
+func isForbiddenError(err error) bool {
+	return strings.Contains(err.Error(), "403")
 }
 
 type ListResponse struct {

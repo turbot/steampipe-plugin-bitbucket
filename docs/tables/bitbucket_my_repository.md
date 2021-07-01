@@ -35,3 +35,22 @@ from
 where
   not is_private;
 ```
+
+### List the unassigned open issues in your repositories
+
+```sql
+select
+  repository_full_name,
+  id,
+  title,
+  state,
+  assignee_display_name,
+  assignee_uuid
+from
+  bitbucket_issue,
+  bitbucket_my_repository as r
+where
+  repository_full_name = r.full_name
+  and assignee_uuid is null
+  and state = 'new';
+```

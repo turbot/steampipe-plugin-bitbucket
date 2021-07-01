@@ -68,6 +68,10 @@ func tableBitbucketWorkspaceMemberList(ctx context.Context, d *plugin.QueryData,
 
 	response, err := client.Workspaces.Members(workspaceSlug)
 	if err != nil {
+		if isNotFoundError(err) || isForbiddenError(err) {
+			return nil, nil
+		}
+		plugin.Logger(ctx).Error("tableBitbucketWorkspaceMemberList", "Error", err)
 		return nil, err
 	}
 
