@@ -40,17 +40,17 @@ where
 
 ```sql
 select
-  repository_full_name,
-  id,
-  title,
-  state,
-  assignee_display_name,
-  assignee_uuid
+  i.repository_full_name,
+  i.id,
+  i.title,
+  i.state,
+  i.assignee_display_name,
+  i.assignee_uuid
 from
-  bitbucket_issue,
+  bitbucket_issue as i,
   bitbucket_my_repository as r
 where
   repository_full_name = r.full_name
-  and assignee_uuid is null
-  and state = 'new';
+  and i.assignee_uuid is null
+  and i.state = 'new';
 ```
