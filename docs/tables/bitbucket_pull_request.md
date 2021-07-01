@@ -14,11 +14,12 @@ select
   id,
   title,
   state,
-  branch_name
+  branch_name,
+  author_display_name,
 from
   bitbucket_pull_request
 where
-  repository_full_name = 'LalitFort/steampipe-plugin-bitbucket'
+  repository_full_name = 'bitbucketpipelines/official-pipes'
   and state = 'OPEN';
 ```
 
@@ -36,7 +37,7 @@ select
 from
   bitbucket_pull_request
 where
-  repository_full_name = 'LalitFort/steampipe-plugin-bitbucket'
+  repository_full_name = 'bitbucketpipelines/official-pipes'
   and state = 'MERGED'
   and updated >= (current_date - interval '7' day)
 order by
@@ -56,7 +57,7 @@ select
 from
   bitbucket_pull_request
 where
-  repository_full_name = 'LalitFort/steampipe-plugin-bitbucket'
-  and author_display_name = 'Lalit'
+  repository_full_name = 'bitbucketpipelines/official-pipes'
+  and author_display_name = 'Tom Gibson'
   and state = 'OPEN';
 ```

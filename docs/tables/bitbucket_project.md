@@ -8,7 +8,7 @@ To list all the **your** projects use the `bitbucket_my_project` table instead. 
 
 ## Examples
 
-### Get information about a specific projects
+### Get information about a specific project
 
 ```sql
 select

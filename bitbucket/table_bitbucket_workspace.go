@@ -8,12 +8,13 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
 
-func tableBitbucketMyWorkspace(_ context.Context) *plugin.Table {
+func tableBitbucketWorkspace(_ context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "bitbucket_my_workspace",
+		Name:        "bitbucket_workspace",
 		Description: "Workspace is where you will create repositories, collaborate on your code, and organize different streams of work in your Bitbucket Cloud account.",
 		List: &plugin.ListConfig{
-			Hydrate: tableBitbucketMyWorkspaceList,
+			KeyColumns: plugin.SingleColumn("slug"),
+			Hydrate:    tableBitbucketWorkspaceGet,
 		},
 		Columns: []*plugin.Column{
 			{
@@ -47,18 +48,29 @@ func tableBitbucketMyWorkspace(_ context.Context) *plugin.Table {
 	}
 }
 
-func tableBitbucketMyWorkspaceList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	plugin.Logger(ctx).Trace("tableBitbucketWorkspaceList")
+func tableBitbucketWorkspaceGet(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("tableBitbucketWorkspaceGet")
+
+	slug := d.KeyColumnQuals["slug"].GetStringValue()
+	if slug == "" {
+		return nil, nil
+	}
+
 	client := connect(ctx, d)
 
-	resp, err := client.Workspaces.List()
+	workspace, err := client.Workspaces.Get(slug)
 	if err != nil {
+		if isNotFoundError(err) || isForbiddenError(err) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
-	for _, workspace := range resp.Workspaces {
-		d.StreamListItem(ctx, workspace)
+	if workspace == nil {
+		return nil, nil
 	}
+
+	d.StreamListItem(ctx, workspace)
 
 	return nil, nil
 }

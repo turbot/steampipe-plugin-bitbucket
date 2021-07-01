@@ -20,5 +20,5 @@ select
 from
   bitbucket_repository
 where
-  full_name = 'LalitFort/steampipe-plugin-bitbucket'
+  full_name = 'bitbucketpipelines/official-pipes'
 ```
