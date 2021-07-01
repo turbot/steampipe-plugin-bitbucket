@@ -44,6 +44,14 @@ func tableBitbucketWorkspace(_ context.Context) *plugin.Table {
 				Description: "Type of the Bitbucket resource.",
 				Type:        proto.ColumnType_STRING,
 			},
+
+			// Standard columns
+			{
+				Name:        "title",
+				Description: ColumnDescriptionTitle,
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("Name"),
+			},
 		},
 	}
 }

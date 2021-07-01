@@ -15,7 +15,7 @@ select
   title,
   state,
   branch_name,
-  author_display_name,
+  author_display_name
 from
   bitbucket_pull_request
 where

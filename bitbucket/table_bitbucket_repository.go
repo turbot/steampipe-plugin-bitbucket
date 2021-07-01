@@ -147,5 +147,13 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Description: "Details of the main branch of the repository.",
 			Type:        proto.ColumnType_JSON,
 		},
+
+		// Standard columns
+		{
+			Name:        "title",
+			Description: ColumnDescriptionTitle,
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Name"),
+		},
 	}
 }

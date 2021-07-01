@@ -48,11 +48,6 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Description: "A current state of the pull request. Can be one of \"MERGED\", \"SUPERSEDED\", \"OPEN\" and \"DECLINED\".",
 				Type:        proto.ColumnType_STRING,
 			},
-			{
-				Name:        "title",
-				Description: "Title of the pull request.",
-				Type:        proto.ColumnType_STRING,
-			},
 
 			// other fields
 			{
@@ -150,6 +145,13 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Description: "List of reviewers of the pull request.",
 				Type:        proto.ColumnType_JSON,
 				Hydrate:     tableBitbucketPullRequestGet,
+			},
+
+			// Standard columns
+			{
+				Name:        "title",
+				Description: ColumnDescriptionTitle,
+				Type:        proto.ColumnType_STRING,
 			},
 		},
 	}

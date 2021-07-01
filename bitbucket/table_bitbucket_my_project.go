@@ -100,6 +100,14 @@ func bitbucketProjectColumns() []*plugin.Column {
 			Description: "Timestamp when project was last updated.",
 			Type:        proto.ColumnType_TIMESTAMP,
 		},
+
+		// Standard columns
+		{
+			Name:        "title",
+			Description: ColumnDescriptionTitle,
+			Type:        proto.ColumnType_STRING,
+			Transform:   transform.FromField("Name"),
+		},
 	}
 }
 
