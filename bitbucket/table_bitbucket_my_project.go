@@ -17,7 +17,7 @@ func tableBitbucketMyProject(_ context.Context) *plugin.Table {
 		Name:        "bitbucket_my_project",
 		Description: "A Bitbucket project. Projects are used by teams to organize repositories.",
 		List: &plugin.ListConfig{
-			ParentHydrate: tableBitbucketWorkspaceList,
+			ParentHydrate: tableBitbucketMyWorkspaceList,
 			Hydrate:       tableBitbucketMyProjectList,
 		},
 		Columns: bitbucketProjectColumns(),

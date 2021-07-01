@@ -12,7 +12,7 @@ func tableBitbucketMyRepository(_ context.Context) *plugin.Table {
 		Name:        "bitbucket_my_repository",
 		Description: "BitBucket repositories that you are associated with. BitBucket Repositories contain all of your project's files and each file's revision history.",
 		List: &plugin.ListConfig{
-			ParentHydrate: tableBitbucketWorkspaceList,
+			ParentHydrate: tableBitbucketMyWorkspaceList,
 			Hydrate:       tableBitbucketMyRepositoryList,
 		},
 		Columns: bitBucketRepositoryColumns(),
