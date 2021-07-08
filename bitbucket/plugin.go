@@ -26,6 +26,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"bitbucket_repository":       tableBitbucketRepository(ctx),
 			"bitbucket_workspace":        tableBitbucketWorkspace(ctx),
 			"bitbucket_workspace_member": tableBitbucketWorkspaceMember(ctx),
+			"bitbucket_branch":           tableBitbucketBranch(ctx),
 		},
 	}
 	return p
