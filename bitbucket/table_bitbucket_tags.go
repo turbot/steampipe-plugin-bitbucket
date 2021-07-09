@@ -42,7 +42,7 @@ func tableBitbucketTag(_ context.Context) *plugin.Table {
 			},
 			{
 				Name:        "target",
-				Description: "The repository's full name.",
+				Description: "Specifies details of target of the tag.",
 				Type:        proto.ColumnType_JSON,
 			},
 			{
@@ -80,19 +80,26 @@ func tableBitbucketTagsList(ctx context.Context, d *plugin.QueryData, _ *plugin.
 	opts := &bitbucket.RepositoryTagOptions{
 		Owner:    owner,
 		RepoSlug: repoName,
+		Pagelen: 100,
 	}
 
-	response, err := client.Repositories.Repository.ListTags(opts)
-	if err != nil {
-		return nil, err
+	for {
+		response, err := client.Repositories.Repository.ListTags(opts)
+		if err != nil {
+			return nil, err
+		}
+
+		// Streaming result of current page
+		for _, tag := range response.Tags {
+			d.StreamListItem(ctx, repositoryTags{tag, repoFullName})
+		}
+
+		// Check for leftover pages (if any)
+		if response.Next == "" {
+			break
+		}
+		opts.PageNum = response.Page + 1
 	}
 
-	if response == nil {
-		return nil, nil
-	}
-
-	for _, tag := range response.Tags {
-		d.StreamListItem(ctx, repositoryTags{tag, repoFullName})
-	}
 	return nil, nil
 }
