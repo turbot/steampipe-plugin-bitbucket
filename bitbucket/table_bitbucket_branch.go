@@ -13,10 +13,10 @@ import (
 func tableBitbucketBranch(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_branch",
-		Description: "BitBucket tags associated with the repository.",
+		Description: "BitBucket Branch.",
 		List: &plugin.ListConfig{
 			KeyColumns: plugin.SingleColumn("repository_full_name"),
-			Hydrate:    tableBitbucketBranchList,
+			Hydrate:    tableBitbucketBranchesList,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.AllColumns([]string{"repository_full_name", "name"}),
@@ -26,44 +26,46 @@ func tableBitbucketBranch(_ context.Context) *plugin.Table {
 			// top fields
 			{
 				Name:        "name",
-				Description: "",
+				Description: "The name of the branch.",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "repository_full_name",
-				Description: "",
+				Description: "The repository full name.",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "type",
-				Description: "",
+				Description: "The branch type.",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "default_merge_strategy",
-				Description: "",
+				Description: "Branch default merge strategy.",
 				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("Default_Merge_Strategy"),
 			},
 
 			// json fields
 			{
 				Name:        "heads",
-				Description: "",
+				Description: "Branch head details.",
 				Type:        proto.ColumnType_JSON,
 			},
 			{
 				Name:        "links",
-				Description: "",
+				Description: "Branch link details.",
 				Type:        proto.ColumnType_JSON,
 			},
 			{
 				Name:        "merge_strategies",
-				Description: "",
+				Description: "Branch merge strategies.",
 				Type:        proto.ColumnType_JSON,
+				Transform:   transform.FromField("Merge_Strategies"),
 			},
 			{
 				Name:        "target",
-				Description: "",
+				Description: "Branch target details.",
 				Type:        proto.ColumnType_JSON,
 			},
 
@@ -83,7 +85,7 @@ type branchList struct {
 	RepositoryFullName string
 }
 
-func tableBitbucketBranchList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func tableBitbucketBranchesList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
 
