@@ -17,6 +17,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 		},
 		DefaultTransform: transform.FromCamel(),
 		TableMap: map[string]*plugin.Table{
+			"bitbucket_branch":           tableBitbucketBranch(ctx),
 			"bitbucket_issue":            tableBitbucketIssue(ctx),
 			"bitbucket_my_project":       tableBitbucketMyProject(ctx),
 			"bitbucket_my_repository":    tableBitbucketMyRepository(ctx),
@@ -26,7 +27,6 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"bitbucket_repository":       tableBitbucketRepository(ctx),
 			"bitbucket_workspace":        tableBitbucketWorkspace(ctx),
 			"bitbucket_workspace_member": tableBitbucketWorkspaceMember(ctx),
-			"bitbucket_branch":           tableBitbucketBranch(ctx),
 		},
 	}
 	return p

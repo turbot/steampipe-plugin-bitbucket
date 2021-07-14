@@ -31,6 +31,6 @@ select
 from
   bitbucket_branch
 where
-  repository_full_name = 'LalitFort/steampipe-plugin-bitbucket'
+  repository_full_name = 'souravthe/test1'
   and default_merge_strategy = 'merge_commit';
 ```
