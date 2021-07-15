@@ -2,8 +2,7 @@ package bitbucket
 
 import (
 	"context"
-	"fmt"
-	"strconv"
+	"errors"
 
 	"github.com/ktrysmt/go-bitbucket"
 	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
@@ -14,14 +13,10 @@ import (
 func tableBitbucketBranchRestriction(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_branch_restriction",
-		Description: "TODO",
+		Description: "Branch restrictions allow you to control the actions users can perform on a single branch, branch type, or branch pattern within a repository.",
 		List: &plugin.ListConfig{
 			KeyColumns: plugin.SingleColumn("repository_full_name"),
 			Hydrate:    tableBitbucketBranchRestrictionsList,
-		},
-		Get: &plugin.GetConfig{
-			KeyColumns: plugin.AllColumns([]string{"repository_full_name", "id"}),
-			Hydrate:    tableBitbucketBranchRestrictionGet,
 		},
 		Columns: []*plugin.Column{
 			// top fields
@@ -31,12 +26,12 @@ func tableBitbucketBranchRestriction(_ context.Context) *plugin.Table {
 				Type:        proto.ColumnType_INT,
 				Transform:   transform.FromGo(),
 			},
-			// {
-			// 	Name:        "self_link",
-			// 	Description: "TODO.",
-			// 	Type:        proto.ColumnType_STRING,
-			// 	Transform:   transform.FromField("Links.self.href"),
-			// },
+			{
+				Name:        "self_link",
+				Description: "The URL to the branch restriction.",
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("Links.self.href"),
+			},
 			{
 				Name:        "repository_full_name",
 				Description: "The repository's full name.",
@@ -47,44 +42,44 @@ func tableBitbucketBranchRestriction(_ context.Context) *plugin.Table {
 			// other fields
 			{
 				Name:        "branch_match_kind",
-				Description: "TODO.",
+				Description: "The Branch match kind for the branch restriction.",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "branch_type",
-				Description: "TODO.",
+				Description: "The type of branch selected while creating the branch restriction.",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "kind",
-				Description: "TODO.",
+				Description: "The type of restriction achieved using the branch restriction.",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "pattern",
-				Description: "TODO.",
+				Description: "The branch name pattern specified while creating the branch restriction.",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "type",
-				Description: "TODO.",
+				Description: "The type of the branch operation.",
 				Type:        proto.ColumnType_STRING,
 			},
 			{
 				Name:        "value",
-				Description: "TODO.",
+				Description: "The value associated to the kind for the branch restriction.",
 				Type:        proto.ColumnType_INT,
 			},
 
 			// json fields
 			{
 				Name:        "groups",
-				Description: "TODO.",
+				Description: "Details of the groups associated with the branch restriction.",
 				Type:        proto.ColumnType_JSON,
 			},
 			{
 				Name:        "users",
-				Description: "TODO.",
+				Description: "Details of the users associated with the branch restriction.",
 				Type:        proto.ColumnType_JSON,
 			},
 
@@ -112,6 +107,9 @@ func tableBitbucketBranchRestrictionsList(ctx context.Context, d *plugin.QueryDa
 
 	response, err := client.Repositories.BranchRestrictions.Gets(opts)
 	if err != nil {
+		if isForbiddenError(err) {
+			return nil, errors.New("Admin access to the repository is required in order to list the branch restrictions.")
+		}
 		if isNotFoundError(err) {
 			return nil, nil
 		}
@@ -136,54 +134,6 @@ func tableBitbucketBranchRestrictionsList(ctx context.Context, d *plugin.QueryDa
 	return nil, nil
 }
 
-func tableBitbucketBranchRestrictionGet(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	plugin.Logger(ctx).Trace("tableBitbucketBranchRestrictionGet")
-	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
-	restriction_id := d.KeyColumnQuals["id"].GetInt64Value()
-	if repoFullName == "" {
-		return nil, nil
-	}
-	owner, repoName := parseRepoFullName(repoFullName)
-
-	if owner == "" || repoName == "" {
-		return nil, fmt.Errorf("repository_full_name should be in the format \"{workspace_slug}/{repo_slug}\"")
-	}
-
-	if restriction_id == 0 {
-		return nil, nil
-	}
-	client := connect(ctx, d)
-
-	opts := &bitbucket.BranchRestrictionsOptions{
-		Owner:    owner,
-		RepoSlug: repoName,
-		ID:       strconv.Itoa(int(restriction_id)),
-	}
-
-	response, err := client.Repositories.BranchRestrictions.Get(opts)
-	plugin.Logger(ctx).Error("tableBitbucketBranchRestrictionGet", "Responseeeeeeeeeee", response)
-	if err != nil {
-		if isNotFoundError(err) {
-			return nil, nil
-		}
-		plugin.Logger(ctx).Error("tableBitbucketBranchRestrictionGet", "Error", err)
-		return nil, err
-	}
-
-	if response == nil {
-		return nil, nil
-	}
-
-	branchRestriction := new(bitbucket.BranchRestrictions)
-	err = decodeJson(response, branchRestriction)
-	plugin.Logger(ctx).Error("tableBitbucketBranchRestrictionGet", "After decodeeeeeeeeeeeeeee", branchRestriction)
-	if err != nil {
-		return nil, err
-	}
-
-	return branchRestriction, nil
-}
-
 type BranchRestrictionList struct {
 	ListResponse
 	BranchRestrictions []BranchRestriction `json:"values,omitempty"`
@@ -194,7 +144,7 @@ type BranchRestriction struct {
 	Pattern         string      `json:"pattern,omitempty"`
 	Kind            string      `json:"kind,omitempty"`
 	Users           interface{} `json:"users,omitempty"`
-	// Links           interface{} `json:"links,omitempty"`
+	Links           interface{} `json:"links,omitempty"`
 	Value           *int        `json:"value,omitempty"`
 	BranchMatchKind string      `json:"branch_match_kind,omitempty"`
 	Groups          interface{} `json:"groups,omitempty"`
