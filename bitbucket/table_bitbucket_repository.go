@@ -2,8 +2,10 @@ package bitbucket
 
 import (
 	"context"
+	"fmt"
+	"strings"
+	"time"
 
-	"github.com/ktrysmt/go-bitbucket"
 	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
@@ -24,21 +26,29 @@ func tableBitbucketRepository(_ context.Context) *plugin.Table {
 func tableBitbucketRepositoryList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	repoFullName := d.KeyColumnQuals["full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
-
 	client := connect(ctx, d)
-	opts := &bitbucket.RepositoryOptions{
-		Owner:    owner,
-		RepoSlug: repoName,
-	}
 
-	repo, err := client.Repositories.Repository.Get(opts)
+	urlStr := client.GetApiBaseURL() + fmt.Sprintf("/repositories/%s/%s", owner, repoName)
+	resp, err := client.HttpClient.Get(urlStr)
 	if err != nil {
+		if isForbiddenError(err) {
+			return nil, nil
+		}
+		if isNotFoundError(err) {
+			return nil, nil
+		}
+		plugin.Logger(ctx).Error("tableBitbucketRepositoryList", "Error", err)
 		return nil, err
 	}
-
-	if repo != nil {
-		d.StreamListItem(ctx, repo)
+	repository := new(Repository)
+	err = decodeResponse(resp, repository)
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid character") {
+			return nil, nil
+		}
+		return nil, err
 	}
+	d.StreamListItem(ctx, repository)
 
 	return nil, nil
 }
@@ -54,7 +64,7 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Name:        "uuid",
 			Description: "The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.",
 			Type:        proto.ColumnType_STRING,
-			Transform:   transform.FromField("Uuid"),
+			Transform:   transform.FromField("UUID"),
 		},
 		{
 			Name:        "slug",
@@ -65,7 +75,13 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Name:        "full_name",
 			Description: "The concatenation of the repository owner's username and the slugified name, e.g. \"turbot/steampipe-plugin-bitbucket\". This is the same string used in Bitbucket URLs.",
 			Type:        proto.ColumnType_STRING,
-			Transform:   transform.FromField("Full_name"),
+			Transform:   transform.FromField("FullName"),
+		},
+		{
+			Name:        "created",
+			Description: "Timestamp when the repository was created.",
+			Type:        proto.ColumnType_TIMESTAMP,
+			Transform:   transform.FromField("CreatedOn"),
 		},
 		{
 			Name:        "description",
@@ -86,13 +102,16 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Name:        "is_private",
 			Description: "Indicates whether the repository is publicly accessible, or whether it is private to the team and consequently only visible to team members.",
 			Type:        proto.ColumnType_BOOL,
-			Transform:   transform.FromField("Is_private"),
 		},
 		{
 			Name:        "has_issues",
 			Description: "To initialize or disable the new repo's issue tracker",
-			Type:        proto.ColumnType_STRING,
-			Transform:   transform.FromField("Has_issues"),
+			Type:        proto.ColumnType_BOOL,
+		},
+		{
+			Name:        "has_wiki",
+			Description: "Indicates whether the repository is having a Wiki or not.",
+			Type:        proto.ColumnType_BOOL,
 		},
 		{
 			Name:        "owner_account_id",
@@ -122,19 +141,19 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Name:        "project_name",
 			Description: "Name of the project this repository belongs to.",
 			Type:        proto.ColumnType_STRING,
-			Transform:   transform.FromField("Project.Name"),
+			Transform:   transform.FromField("Project.name"),
 		},
 		{
 			Name:        "project_key",
 			Description: "Key of the project this repository belongs to.",
 			Type:        proto.ColumnType_STRING,
-			Transform:   transform.FromField("Project.Key"),
+			Transform:   transform.FromField("Project.key"),
 		},
 		{
 			Name:        "project_uuid",
 			Description: "UUID of the project this repository belongs to.",
 			Type:        proto.ColumnType_STRING,
-			Transform:   transform.FromField("Project.Uuid"),
+			Transform:   transform.FromField("Project.uuid"),
 		},
 		{
 			Name:        "self_link",
@@ -143,11 +162,21 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Transform:   transform.FromField("Links.self.href"),
 		},
 		{
+			Name:        "website",
+			Description: "Self link to this repository.",
+			Type:        proto.ColumnType_STRING,
+		},
+		{
+			Name:        "updated",
+			Description: "Timestamp when the repository was last updated.",
+			Type:        proto.ColumnType_TIMESTAMP,
+			Transform:   transform.FromField("UpdatedOn"),
+		},
+		{
 			Name:        "mainbranch",
 			Description: "Details of the main branch of the repository.",
 			Type:        proto.ColumnType_JSON,
 		},
-
 		// Standard columns
 		{
 			Name:        "title",
@@ -156,4 +185,32 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Transform:   transform.FromField("Name"),
 		},
 	}
+}
+
+//// Custom Structs
+
+type RepositoryList struct {
+	ListResponse
+	Repositories []Repository `json:"values,omitempty"`
+}
+
+type Repository struct {
+	Website     string      `json:"website,omitempty"`
+	HasWiki     bool        `json:"has_wiki,omitempty"`
+	UUID        string      `json:"uuid,omitempty"`
+	Links       interface{} `json:"links,omitempty"`
+	ForkPolicy  string      `json:"fork_policy,omitempty"`
+	Name        string      `json:"name,omitempty"`
+	Project     interface{} `json:"project,omitempty"`
+	Language    string      `json:"language,omitempty"`
+	CreatedOn   time.Time   `json:"created_on,omitempty"`
+	Mainbranch  interface{} `json:"mainbranch,omitempty"`
+	Workspace   interface{} `json:"workspace,omitempty"`
+	HasIssues   bool        `json:"has_issues,omitempty"`
+	Owner       interface{} `json:"owner,omitempty"`
+	UpdatedOn   time.Time   `json:"updated_on,omitempty"`
+	Slug        string      `json:"slug,omitempty"`
+	IsPrivate   bool        `json:"is_private,omitempty"`
+	Description string      `json:"description,omitempty"`
+	FullName    string      `json:"full_name,omitempty"`
 }

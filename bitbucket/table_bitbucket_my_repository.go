@@ -2,6 +2,7 @@ package bitbucket
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ktrysmt/go-bitbucket"
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
@@ -23,15 +24,25 @@ func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, h 
 	owner := h.Item.(bitbucket.Workspace).Slug
 	client := connect(ctx, d)
 
-	repos, err := client.Repositories.ListForAccount(&bitbucket.RepositoriesOptions{
-		Owner: owner,
-	})
-
+	urlStr := client.GetApiBaseURL() + fmt.Sprintf("/repositories/%s", owner)
+	resp, err := client.HttpClient.Get(urlStr)
 	if err != nil {
+		if isForbiddenError(err) {
+			return nil, nil
+		}
+		if isNotFoundError(err) {
+			return nil, nil
+		}
+		plugin.Logger(ctx).Error("tableBitbucketRepositoryList", "Error", err)
 		return nil, err
 	}
 
-	for _, repo := range repos.Items {
+	repository := new(RepositoryList)
+	err = decodeResponse(resp, repository)
+	if err != nil {
+		return nil, err
+	}
+	for _, repo := range repository.Repositories {
 		d.StreamListItem(ctx, repo)
 	}
 
