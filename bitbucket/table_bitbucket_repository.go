@@ -25,6 +25,9 @@ func tableBitbucketRepository(_ context.Context) *plugin.Table {
 
 func tableBitbucketRepositoryList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	repoFullName := d.KeyColumnQuals["full_name"].GetStringValue()
+	if repoFullName == "" {
+		return nil, nil
+	}
 	owner, repoName := parseRepoFullName(repoFullName)
 	client := connect(ctx, d)
 
@@ -195,22 +198,22 @@ type RepositoryList struct {
 }
 
 type Repository struct {
-	Website     string      `json:"website,omitempty"`
-	HasWiki     bool        `json:"has_wiki,omitempty"`
-	UUID        string      `json:"uuid,omitempty"`
-	Links       interface{} `json:"links,omitempty"`
-	ForkPolicy  string      `json:"fork_policy,omitempty"`
-	Name        string      `json:"name,omitempty"`
-	Project     interface{} `json:"project,omitempty"`
-	Language    string      `json:"language,omitempty"`
-	CreatedOn   time.Time   `json:"created_on,omitempty"`
-	Mainbranch  interface{} `json:"mainbranch,omitempty"`
-	Workspace   interface{} `json:"workspace,omitempty"`
-	HasIssues   bool        `json:"has_issues,omitempty"`
-	Owner       interface{} `json:"owner,omitempty"`
-	UpdatedOn   time.Time   `json:"updated_on,omitempty"`
-	Slug        string      `json:"slug,omitempty"`
-	IsPrivate   bool        `json:"is_private,omitempty"`
-	Description string      `json:"description,omitempty"`
-	FullName    string      `json:"full_name,omitempty"`
+	Website     string                 `json:"website,omitempty"`
+	HasWiki     bool                   `json:"has_wiki,omitempty"`
+	UUID        string                 `json:"uuid,omitempty"`
+	Links       map[string]interface{} `json:"links,omitempty"`
+	ForkPolicy  string                 `json:"fork_policy,omitempty"`
+	Name        string                 `json:"name,omitempty"`
+	Project     map[string]interface{} `json:"project,omitempty"`
+	Language    string                 `json:"language,omitempty"`
+	CreatedOn   *time.Time             `json:"created_on,omitempty"`
+	Mainbranch  map[string]interface{} `json:"mainbranch,omitempty"`
+	Workspace   map[string]interface{} `json:"workspace,omitempty"`
+	HasIssues   bool                   `json:"has_issues,omitempty"`
+	Owner       map[string]interface{} `json:"owner,omitempty"`
+	UpdatedOn   *time.Time             `json:"updated_on,omitempty"`
+	Slug        string                 `json:"slug,omitempty"`
+	IsPrivate   bool                   `json:"is_private,omitempty"`
+	Description string                 `json:"description,omitempty"`
+	FullName    string                 `json:"full_name,omitempty"`
 }
