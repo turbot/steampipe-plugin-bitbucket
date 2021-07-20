@@ -121,6 +121,11 @@ func tableBitbucketCommitsList(ctx context.Context, d *plugin.QueryData, _ *plug
 	plugin.Logger(ctx).Trace("tableBitbucketCommitsList")
 	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
+
+	if owner == "" || repoName == "" {
+		return nil, fmt.Errorf("repository_full_name should be in the format \"{workspace_slug}/{repo_slug}\"")
+	}
+
 	client := connect(ctx, d)
 
 	opts := &bitbucket.CommitsOptions{
