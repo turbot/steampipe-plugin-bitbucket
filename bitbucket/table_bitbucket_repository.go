@@ -14,9 +14,9 @@ import (
 func tableBitbucketRepository(_ context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "bitbucket_repository",
-		Description: "BitBucket repositories that you are associated with. BitBucket repositories contain all of your project's files and each file's revision history.",
+		Description: "BitBucket repositorie that you are associated with. BitBucket repositories contain all of your project's files and each file's revision history.",
 		List: &plugin.ListConfig{
-			KeyColumns: plugin.SingleColumn("repository_full_name"),
+			KeyColumns: plugin.SingleColumn("full_name"),
 			Hydrate:    tableBitbucketRepositoryList,
 		},
 		Columns: bitBucketRepositoryColumns(),
@@ -24,16 +24,11 @@ func tableBitbucketRepository(_ context.Context) *plugin.Table {
 }
 
 func tableBitbucketRepositoryList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
+	repoFullName := d.KeyColumnQuals["full_name"].GetStringValue()
 	if repoFullName == "" {
 		return nil, nil
 	}
 	owner, repoName := parseRepoFullName(repoFullName)
-
-	if owner == "" || repoName == "" {
-		return nil, fmt.Errorf("repository_full_name should be in the format \"{workspace_slug}/{repo_slug}\"")
-	}
-
 	client := connect(ctx, d)
 
 	urlStr := client.GetApiBaseURL() + fmt.Sprintf("/repositories/%s/%s", owner, repoName)
@@ -80,7 +75,7 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Type:        proto.ColumnType_STRING,
 		},
 		{
-			Name:        "repository_full_name",
+			Name:        "full_name",
 			Description: "The concatenation of the repository owner's username and the slugified name, e.g. \"turbot/steampipe-plugin-bitbucket\". This is the same string used in Bitbucket URLs.",
 			Type:        proto.ColumnType_STRING,
 			Transform:   transform.FromField("FullName"),
