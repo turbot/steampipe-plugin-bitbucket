@@ -3,6 +3,7 @@ package bitbucket
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/ktrysmt/go-bitbucket"
 	"github.com/turbot/steampipe-plugin-sdk/grpc/proto"
@@ -98,6 +99,11 @@ func tableBitbucketBranchRestrictionsList(ctx context.Context, d *plugin.QueryDa
 	plugin.Logger(ctx).Trace("tableBitbucketBranchRestrictionsList")
 	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
+
+	if owner == "" || repoName == "" {
+		return nil, fmt.Errorf("repository_full_name should be in the format \"{workspace_slug}/{repo_slug}\"")
+	}
+
 	client := connect(ctx, d)
 
 	opts := &bitbucket.BranchRestrictionsOptions{
