@@ -29,16 +29,18 @@ func tableBitbucketTag(_ context.Context) *plugin.Table {
 				Name:        "repository_full_name",
 				Description: "The concatenation of the repository owner's username and the slugified name, e.g. \"turbot/steampipe-plugin-bitbucket\". This is the same string used in Bitbucket URLs.",
 				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromQual("repository_full_name"),
+			},
+			{
+				Name:        "self_link",
+				Description: "A link to a resource related to this object.",
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("Links.self.href"),
 			},
 			{
 				Name:        "type",
 				Description: "Type of the Bitbucket resource. It will be always \"tag\".",
 				Type:        proto.ColumnType_STRING,
-			},
-			{
-				Name:        "links",
-				Description: "A link to a resource related to this object.",
-				Type:        proto.ColumnType_JSON,
 			},
 			{
 				Name:        "target",
@@ -62,11 +64,6 @@ func tableBitbucketTag(_ context.Context) *plugin.Table {
 	}
 }
 
-type repositoryTags = struct {
-	bitbucket.RepositoryTag
-	RepositoryFullName string
-}
-
 //// LIST FUNCTION
 
 func tableBitbucketTagsList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
@@ -80,7 +77,7 @@ func tableBitbucketTagsList(ctx context.Context, d *plugin.QueryData, _ *plugin.
 	opts := &bitbucket.RepositoryTagOptions{
 		Owner:    owner,
 		RepoSlug: repoName,
-		Pagelen: 100,
+		Pagelen:  100,
 	}
 
 	for {
@@ -91,7 +88,7 @@ func tableBitbucketTagsList(ctx context.Context, d *plugin.QueryData, _ *plugin.
 
 		// Streaming result of current page
 		for _, tag := range response.Tags {
-			d.StreamListItem(ctx, repositoryTags{tag, repoFullName})
+			d.StreamListItem(ctx, tag)
 		}
 
 		// Check for leftover pages (if any)
