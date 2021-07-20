@@ -20,7 +20,7 @@ where
   repository_full_name = 'souravthe/test1';
 ```
 
-### List branches where default merge strategy is merge_commit
+### List branches with `merge_commit` default merge strategy
 
 ```sql
 select

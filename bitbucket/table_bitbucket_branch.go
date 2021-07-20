@@ -33,6 +33,7 @@ func tableBitbucketBranch(_ context.Context) *plugin.Table {
 				Name:        "repository_full_name",
 				Description: "The repository full name.",
 				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromQual("repository_full_name"),
 			},
 			{
 				Name:        "type",
@@ -80,11 +81,6 @@ func tableBitbucketBranch(_ context.Context) *plugin.Table {
 	}
 }
 
-type branchList struct {
-	bitbucket.RepositoryBranch
-	RepositoryFullName string
-}
-
 func tableBitbucketBranchesList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
@@ -101,7 +97,7 @@ func tableBitbucketBranchesList(ctx context.Context, d *plugin.QueryData, _ *plu
 	}
 	if branches != nil {
 		for _, branch := range branches.Branches {
-			d.StreamListItem(ctx, branchList{branch, repoFullName})
+			d.StreamListItem(ctx, branch)
 		}
 	}
 
@@ -144,5 +140,5 @@ func tableBitbucketBranchGet(ctx context.Context, d *plugin.QueryData, h *plugin
 		return nil, nil
 	}
 
-	return branchList{*response, repoFullName}, nil
+	return response, nil
 }
