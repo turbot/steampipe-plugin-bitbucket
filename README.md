@@ -33,7 +33,7 @@ Prerequisites:
 Clone:
 
 ```sh
-git clone git@github.com:turbot/steampipe-plugin-bitbucket
+git clone https://github.com/turbot/steampipe-plugin-bitbucket.git
 cd steampipe-plugin-bitbucket
 ```
 
