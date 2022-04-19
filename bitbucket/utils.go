@@ -9,7 +9,7 @@ import (
 
 	"github.com/ktrysmt/go-bitbucket"
 
-	"github.com/turbot/steampipe-plugin-sdk/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
 )
 
 //// Constants
