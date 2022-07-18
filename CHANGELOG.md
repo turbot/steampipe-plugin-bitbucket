@@ -1,3 +1,9 @@
+## v0.2.2 [2022-07-18]
+
+_Bug fixes_
+
+- Added pagination support to `bitbucket_branch` table to allow more than 10 results to be returned. ([#58](https://github.com/turbot/steampipe-plugin-bitbucket/pull/58))
+
 ## v0.2.1 [2022-05-23]
 
 _Bug fixes_
