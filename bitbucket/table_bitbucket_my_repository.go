@@ -33,6 +33,11 @@ func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, h 
 
 	for _, repo := range repos.Items {
 		d.StreamListItem(ctx, repo)
+
+		// Context can be cancelled due to manual cancellation or the limit has been hit
+		if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			return nil, nil
+		}
 	}
 
 	return nil, nil

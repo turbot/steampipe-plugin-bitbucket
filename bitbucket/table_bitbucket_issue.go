@@ -180,6 +180,11 @@ func tableBitbucketIssuesList(ctx context.Context, d *plugin.QueryData, _ *plugi
 
 	for _, issue := range issueList.Issues {
 		d.StreamListItem(ctx, issue)
+
+		// Context can be cancelled due to manual cancellation or the limit has been hit
+		if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			return nil, nil
+		}
 	}
 
 	return nil, nil
