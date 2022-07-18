@@ -89,15 +89,44 @@ func tableBitbucketBranchesList(ctx context.Context, d *plugin.QueryData, _ *plu
 	opts := &bitbucket.RepositoryBranchOptions{
 		Owner:    owner,
 		RepoSlug: repoName,
+		Pagelen:  100,
 	}
 
-	branches, err := client.Repositories.Repository.ListBranches(opts)
-	if err != nil {
-		return nil, err
+	// Limiting the results
+	limit := d.QueryContext.Limit
+	if d.QueryContext.Limit != nil {
+		if int(*limit) < opts.Pagelen {
+			if *limit < 1 {
+				opts.Pagelen = 1
+			} else {
+				opts.Pagelen = int(*limit)
+			}
+		}
 	}
-	if branches != nil {
-		for _, branch := range branches.Branches {
-			d.StreamListItem(ctx, branch)
+
+	pagesLeft := true
+
+	for pagesLeft {
+		branches, err := client.Repositories.Repository.ListBranches(opts)
+		if err != nil {
+			return nil, err
+		}
+
+		if branches != nil {
+			for _, branch := range branches.Branches {
+				d.StreamListItem(ctx, branch)
+
+				// Context can be cancelled due to manual cancellation or the limit has been hit
+				if d.QueryStatus.RowsRemaining(ctx) == 0 {
+					return nil, nil
+				}
+			}
+		}
+
+		if branches.Next == "" {
+			pagesLeft = false
+		} else {
+			opts.PageNum = branches.Page + 1
 		}
 	}
 

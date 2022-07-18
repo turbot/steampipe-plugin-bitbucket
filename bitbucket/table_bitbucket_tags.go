@@ -80,6 +80,18 @@ func tableBitbucketTagsList(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		Pagelen:  100,
 	}
 
+	// Limiting the results
+	limit := d.QueryContext.Limit
+	if d.QueryContext.Limit != nil {
+		if int(*limit) < opts.Pagelen {
+			if *limit < 1 {
+				opts.Pagelen = 1
+			} else {
+				opts.Pagelen = int(*limit)
+			}
+		}
+	}
+
 	for {
 		response, err := client.Repositories.Repository.ListTags(opts)
 		if err != nil {
@@ -89,6 +101,11 @@ func tableBitbucketTagsList(ctx context.Context, d *plugin.QueryData, _ *plugin.
 		// Streaming result of current page
 		for _, tag := range response.Tags {
 			d.StreamListItem(ctx, tag)
+
+			// Context can be cancelled due to manual cancellation or the limit has been hit
+			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+				return nil, nil
+			}
 		}
 
 		// Check for leftover pages (if any)

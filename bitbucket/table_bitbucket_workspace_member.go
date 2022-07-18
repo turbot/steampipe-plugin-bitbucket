@@ -95,6 +95,11 @@ func tableBitbucketWorkspaceMemberList(ctx context.Context, d *plugin.QueryData,
 
 	for _, item := range memberList.Members {
 		d.StreamListItem(ctx, item)
+
+		// Context can be cancelled due to manual cancellation or the limit has been hit
+		if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			return nil, nil
+		}
 	}
 
 	return nil, nil

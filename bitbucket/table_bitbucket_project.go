@@ -50,6 +50,11 @@ func tableBitbucketProjectList(ctx context.Context, d *plugin.QueryData, h *plug
 
 		for _, project := range projectList.Projects {
 			d.StreamListItem(ctx, project)
+
+			// Context can be cancelled due to manual cancellation or the limit has been hit
+			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+				return nil, nil
+			}
 		}
 
 		if projectList.Next == "" {

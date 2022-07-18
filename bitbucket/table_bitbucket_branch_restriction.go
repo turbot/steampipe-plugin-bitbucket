@@ -135,6 +135,11 @@ func tableBitbucketBranchRestrictionsList(ctx context.Context, d *plugin.QueryDa
 
 	for _, branchRestriction := range branchRestrictionList.BranchRestrictions {
 		d.StreamListItem(ctx, branchRestriction)
+
+		// Context can be cancelled due to manual cancellation or the limit has been hit
+		if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			return nil, nil
+		}
 	}
 
 	return nil, nil
