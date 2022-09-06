@@ -1,10 +1,10 @@
 module github.com/turbot/steampipe-plugin-bitbucket
 
-go 1.18
+go 1.19
 
 require (
 	github.com/ktrysmt/go-bitbucket v0.9.16
-	github.com/turbot/steampipe-plugin-sdk/v3 v3.3.2
+	github.com/turbot/steampipe-plugin-sdk/v4 v3.3.2
 )
 
 require (

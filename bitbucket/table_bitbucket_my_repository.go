@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/ktrysmt/go-bitbucket"
-	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
 func tableBitbucketMyRepository(_ context.Context) *plugin.Table {
