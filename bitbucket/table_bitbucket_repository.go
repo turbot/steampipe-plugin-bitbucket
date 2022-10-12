@@ -147,7 +147,13 @@ func bitBucketRepositoryColumns() []*plugin.Column {
 			Description: "Details of the main branch of the repository.",
 			Type:        proto.ColumnType_JSON,
 		},
-
+		{
+			Name:        "default_reviewers",
+			Description: "Details of the default reviewers of the repository.",
+			Type:        proto.ColumnType_JSON,
+			Hydrate:     tableBitbucketDefaultReviewersList,
+			Transform:   transform.FromValue(),
+		},
 		// Standard columns
 		{
 			Name:        "title",

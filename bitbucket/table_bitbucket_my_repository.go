@@ -42,3 +42,32 @@ func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, h 
 
 	return nil, nil
 }
+
+func tableBitbucketDefaultReviewersList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+	plugin.Logger(ctx).Trace("tableBitbucketDefaultReviewersList")
+	data := h.Item.(bitbucket.Repository)
+	owner:= data.Owner["display_name"]
+	uuid:= data.Uuid
+	repoSlug:= data.Slug
+	client := connect(ctx, d)
+
+	opts := &bitbucket.RepositoryOptions{
+		Owner: owner.(string),
+		Uuid:  uuid,
+		RepoSlug: repoSlug,
+	}
+
+	response, err := client.Repositories.Repository.ListDefaultReviewers(opts)
+	if err != nil {
+		if isNotFoundError(err) {
+			return nil, nil
+		}
+		plugin.Logger(ctx).Error("tableBitbucketDefaultReviewersList", "Error", err)
+		return nil, err
+	}
+
+	if response == nil {
+		return nil, nil
+	}
+	return response,nil
+}
