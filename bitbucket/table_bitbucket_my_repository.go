@@ -69,5 +69,5 @@ func tableBitbucketDefaultReviewersList(ctx context.Context, d *plugin.QueryData
 	if response == nil {
 		return nil, nil
 	}
-	return response,nil
+	return response.DefaultReviewers,nil
 }
