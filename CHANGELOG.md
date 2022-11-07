@@ -1,3 +1,9 @@
+## v0.3.1 [2022-11-08]
+
+_Bug fixes_
+
+- Fixed the `docs/index.md` and the `config/bitbucket.spc` files to include the correct permission scope to query the tables. ([#66](https://github.com/turbot/steampipe-plugin-bitbucket/pull/66))
+
 ## v0.3.0 [2022-09-27]
 
 _Dependencies_
