@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/ktrysmt/go-bitbucket"
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableBitbucketBranch(_ context.Context) *plugin.Table {
@@ -82,7 +82,7 @@ func tableBitbucketBranch(_ context.Context) *plugin.Table {
 }
 
 func tableBitbucketBranchesList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
+	repoFullName := d.EqualsQuals["repository_full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
 
 	client := connect(ctx, d)
@@ -117,7 +117,7 @@ func tableBitbucketBranchesList(ctx context.Context, d *plugin.QueryData, _ *plu
 				d.StreamListItem(ctx, branch)
 
 				// Context can be cancelled due to manual cancellation or the limit has been hit
-				if d.QueryStatus.RowsRemaining(ctx) == 0 {
+				if d.RowsRemaining(ctx) == 0 {
 					return nil, nil
 				}
 			}
@@ -136,8 +136,8 @@ func tableBitbucketBranchesList(ctx context.Context, d *plugin.QueryData, _ *plu
 func tableBitbucketBranchGet(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Trace("tableBitbucketBranchGet")
 
-	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
-	name := d.KeyColumnQuals["name"].GetStringValue()
+	repoFullName := d.EqualsQuals["repository_full_name"].GetStringValue()
+	name := d.EqualsQuals["name"].GetStringValue()
 
 	if repoFullName == "" || name == "" {
 		return nil, nil

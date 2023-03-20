@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/ktrysmt/go-bitbucket"
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableBitbucketRepository(_ context.Context) *plugin.Table {
@@ -22,7 +22,7 @@ func tableBitbucketRepository(_ context.Context) *plugin.Table {
 }
 
 func tableBitbucketRepositoryList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	repoFullName := d.KeyColumnQuals["full_name"].GetStringValue()
+	repoFullName := d.EqualsQuals["full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
 
 	client := connect(ctx, d)

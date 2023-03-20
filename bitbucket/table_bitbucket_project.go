@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 // https://developer.atlassian.com/bitbucket/api/2/reference/resource/workspaces/%7Bworkspace%7D/projects
@@ -26,7 +26,7 @@ func tableBitbucketProject(_ context.Context) *plugin.Table {
 
 func tableBitbucketProjectList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Trace("tableBitbucketProjectList")
-	workspace := d.KeyColumnQuals["workspace_slug"].GetStringValue()
+	workspace := d.EqualsQuals["workspace_slug"].GetStringValue()
 	if workspace == "" {
 		return nil, nil
 	}
@@ -52,7 +52,7 @@ func tableBitbucketProjectList(ctx context.Context, d *plugin.QueryData, h *plug
 			d.StreamListItem(ctx, project)
 
 			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			if d.RowsRemaining(ctx) == 0 {
 				return nil, nil
 			}
 		}
@@ -67,8 +67,8 @@ func tableBitbucketProjectList(ctx context.Context, d *plugin.QueryData, h *plug
 
 func tableBitbucketProjectGet(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Trace("tableBitbucketProjectGet")
-	workspace := d.KeyColumnQuals["workspace_slug"].GetStringValue()
-	key := d.KeyColumnQuals["key"].GetStringValue()
+	workspace := d.EqualsQuals["workspace_slug"].GetStringValue()
+	key := d.EqualsQuals["key"].GetStringValue()
 	if workspace == "" || key == "" {
 		return nil, nil
 	}
