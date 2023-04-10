@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/ktrysmt/go-bitbucket"
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
@@ -159,7 +159,7 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 
 func tableBitbucketPullRequestList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Trace("tableBitbucketPullRequestList")
-	repoFullName := d.KeyColumnQuals["repository_full_name"].GetStringValue()
+	repoFullName := d.EqualsQuals["repository_full_name"].GetStringValue()
 	owner, repoName := parseRepoFullName(repoFullName)
 	client := connect(ctx, d)
 
@@ -188,7 +188,7 @@ func tableBitbucketPullRequestList(ctx context.Context, d *plugin.QueryData, _ *
 		d.StreamListItem(ctx, issue)
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		if d.QueryStatus.RowsRemaining(ctx) == 0 {
+		if d.RowsRemaining(ctx) == 0 {
 			return nil, nil
 		}
 	}
@@ -206,8 +206,8 @@ func tableBitbucketPullRequestGet(ctx context.Context, d *plugin.QueryData, h *p
 		repoFullName = (h.Item.(PullRequest).Destination["repository"]).(map[string]interface{})["full_name"].(string)
 		issue_id = int64(h.Item.(PullRequest).ID)
 	} else {
-		repoFullName = d.KeyColumnQuals["repository_full_name"].GetStringValue()
-		issue_id = d.KeyColumnQuals["id"].GetInt64Value()
+		repoFullName = d.EqualsQuals["repository_full_name"].GetStringValue()
+		issue_id = d.EqualsQuals["id"].GetInt64Value()
 	}
 
 	if repoFullName == "" {

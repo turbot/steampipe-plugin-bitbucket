@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/ktrysmt/go-bitbucket"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
 func tableBitbucketMyRepository(_ context.Context) *plugin.Table {
@@ -35,7 +35,7 @@ func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, h 
 		d.StreamListItem(ctx, repo)
 
 		// Context can be cancelled due to manual cancellation or the limit has been hit
-		if d.QueryStatus.RowsRemaining(ctx) == 0 {
+		if d.RowsRemaining(ctx) == 0 {
 			return nil, nil
 		}
 	}

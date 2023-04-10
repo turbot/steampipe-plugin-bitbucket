@@ -3,9 +3,9 @@ package bitbucket
 import (
 	"context"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableBitbucketWorkspace(_ context.Context) *plugin.Table {
@@ -59,7 +59,7 @@ func tableBitbucketWorkspace(_ context.Context) *plugin.Table {
 func tableBitbucketWorkspaceGet(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Trace("tableBitbucketWorkspaceGet")
 
-	slug := d.KeyColumnQuals["slug"].GetStringValue()
+	slug := d.EqualsQuals["slug"].GetStringValue()
 	if slug == "" {
 		return nil, nil
 	}
