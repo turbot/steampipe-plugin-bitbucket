@@ -5,7 +5,7 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/schema"
 )
 
-type githubConfig struct {
+type bitbucketConfig struct {
 	Username *string `cty:"username"`
 	Password *string `cty:"password"`
 	BaseUrl  *string `cty:"base_url"`
@@ -24,14 +24,14 @@ var ConfigSchema = map[string]*schema.Attribute{
 }
 
 func ConfigInstance() interface{} {
-	return &githubConfig{}
+	return &bitbucketConfig{}
 }
 
 // GetConfig :: retrieve and cast connection config from query data
-func GetConfig(connection *plugin.Connection) githubConfig {
+func GetConfig(connection *plugin.Connection) bitbucketConfig {
 	if connection == nil || connection.Config == nil {
-		return githubConfig{}
+		return bitbucketConfig{}
 	}
-	config, _ := connection.Config.(githubConfig)
+	config, _ := connection.Config.(bitbucketConfig)
 	return config
 }
