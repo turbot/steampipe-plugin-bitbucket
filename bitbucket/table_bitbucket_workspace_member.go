@@ -39,6 +39,30 @@ func tableBitbucketWorkspaceMember(_ context.Context) *plugin.Table {
 				Transform:   transform.FromField("User.AccountId"),
 			},
 			{
+				Name:        "account_status",
+				Description: "Status of the user.",
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("User.AccountStatus"),
+			},
+			{
+				Name:        "created_on",
+				Description: "Creation date of the user.",
+				Type:        proto.ColumnType_TIMESTAMP,
+				Transform:   transform.FromField("User.CreatedOn"),
+			},
+			{
+				Name:        "is_staff",
+				Description: "Is staff user.",
+				Type:        proto.ColumnType_BOOL,
+				Transform:   transform.FromField("User.IsStaff"),
+			},
+			{
+				Name:        "nickname",
+				Description: "Account name defined by the owner.",
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("User.Nickname"),
+			},
+			{
 				Name:        "self_link",
 				Description: "Self link to the member.",
 				Type:        proto.ColumnType_STRING,
