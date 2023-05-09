@@ -2,7 +2,7 @@
 
 _Enhancements_
 
-- Added columns `account_status`, `created_on`, `is_staff` and `nickname` to `bitbucket_workspace_member` table. ([#71](https://github.com/turbot/steampipe-plugin-bitbucket/pull/71))
+- Added columns `account_status`, `created_on`, `is_staff` and `nickname` to `bitbucket_workspace_member` table. ([#71](https://github.com/turbot/steampipe-plugin-bitbucket/pull/71)) (Thanks [@pdecat](https://github.com/pdecat) for the contribution!)
 
 ## v0.4.0 [2023-04-10]
 
