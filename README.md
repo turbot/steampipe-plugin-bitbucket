@@ -6,7 +6,7 @@ Use SQL to query repositories, projects, merge requests and more from Bitbucket.
 
 - **[Get started →](https://hub.steampipe.io/plugins/turbot/bitbucket)**
 - Documentation: [Table definitions & examples](https://hub.steampipe.io/plugins/turbot/bitbucket/tables)
-- Community: [Slack Channel](https://steampipe.io/community/join)
+- Community: [Join #steampipe on Slack →](https://turbot.com/community/join)
 - Get involved: [Issues](https://github.com/turbot/steampipe-plugin-bitbucket/issues)
 
 ## Quick start
