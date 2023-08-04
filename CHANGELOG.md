@@ -1,3 +1,13 @@
+## v0.6.0 [2023-08-04]
+
+_Enhancements_
+
+- Added the `default_reviewers` column to `bitbucket_repository` and `bitbucket_my_repository` tables. ([#64](https://github.com/turbot/steampipe-plugin-bitbucket/pull/64))
+
+_Dependencies_
+
+- Recompiled plugin with [steampipe-plugin-sdk v5.5.0](https://github.com/turbot/steampipe-plugin-sdk/blob/v5.5.0/CHANGELOG.md#v550-2023-06-16) which significantly reduces API calls and boosts query performance, resulting in faster data retrieval. ([#72](https://github.com/turbot/steampipe-plugin-bitbucket/pull/72))
+
 ## v0.5.0 [2023-05-09]
 
 _Enhancements_
