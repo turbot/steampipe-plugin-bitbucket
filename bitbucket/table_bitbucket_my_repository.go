@@ -44,7 +44,7 @@ func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, h 
 }
 
 func tableBitbucketDefaultReviewersList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
-	plugin.Logger(ctx).Trace("tableBitbucketDefaultReviewersList")
+	plugin.Logger(ctx).Debug("tableBitbucketDefaultReviewersList")
 	data := h.Item.(bitbucket.Repository)
 	owner:= data.Owner["display_name"]
 	uuid:= data.Uuid
