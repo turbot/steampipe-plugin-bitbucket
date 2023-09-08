@@ -1,3 +1,9 @@
+## v0.6.1 [2023-09-08]
+
+_Bug fixes_
+
+- Updated the `bitbucket.spc` and `index.md` files to include details of `BITBUCKET_USERNAME`, `BITBUCKET_PASSWORD`, and `BITBUCKET_API_BASE_URL` environment variables. ([#77](https://github.com/turbot/steampipe-plugin-bitbucket/pull/77))
+
 ## v0.6.0 [2023-08-04]
 
 _Enhancements_
