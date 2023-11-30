@@ -1,12 +1,20 @@
-# Table: bitbucket_issue
+---
+title: "Steampipe Table: bitbucket_issue - Query Bitbucket Issues using SQL"
+description: "Allows users to query Bitbucket Issues, specifically providing details about each issue such as its ID, title, type, priority, status, and assignee, offering insights into project management and task distribution."
+---
 
-Bitbucket issues are used to track ideas, enhancements, tasks, or bugs for work on Bitbucket.
+# Table: bitbucket_issue - Query Bitbucket Issues using SQL
 
-The `bitbucket_issue` table can be used to query issues belonging to a repository, and **you must specify which repository** with `where repository_full_name='workspace/repository'`.
+Bitbucket Issues is a feature within Bitbucket that allows you to track and manage tasks, enhancements, and bugs for your projects. It provides a centralized platform to manage issues for various Bitbucket repositories, including details such as issue ID, title, type, priority, status, and assignee. Bitbucket Issues helps you stay informed about the progress and distribution of tasks within your project.
+
+## Table Usage Guide
+
+The `bitbucket_issue` table provides insights into issue management within Bitbucket. As a project manager or developer, explore issue-specific details through this table, including issue type, priority, status, and assignee. Utilize it to uncover information about issues, such as their distribution among team members, the status of various tasks, and the prioritization of enhancements and bugs.
 
 ## Examples
 
 ### List the issues in a repository
+Explore which issues are currently present in a specific project repository. This is useful for project managers who need to assess the status and assignment of issues for effective project management.
 
 ```sql
 select
@@ -23,6 +31,7 @@ where
 ```
 
 ### List the unassigned open issues in a repository
+Explore which open issues in a specific repository have not been assigned yet, enabling efficient task allocation and workload management.
 
 ```sql
 select
@@ -41,6 +50,7 @@ where
 ```
 
 ### List the open issues in a repository assigned to a specific user
+Explore which open issues in a specific repository are assigned to a particular user. This can be useful for project managers to track individual workloads and identify any potential bottlenecks in project progression.
 
 ```sql
 select
@@ -59,6 +69,7 @@ where
 ```
 
 ### Report of the number issues in a repository by author
+Analyze the distribution of issues in a specific repository based on the author to understand their individual contributions and identify any patterns or anomalies.
 
 ```sql
 select
@@ -77,6 +88,7 @@ order by
 ```
 
 ### List the unassigned open issues in your repositories
+Explore the open issues in your repositories that have not been assigned to anyone. This is useful in identifying areas that need attention or tasks that are yet to be allocated to team members.
 
 ```sql
 select

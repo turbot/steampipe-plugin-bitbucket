@@ -1,12 +1,20 @@
-# Table: bitbucket_commit
+---
+title: "Steampipe Table: bitbucket_commit - Query Bitbucket Commits using SQL"
+description: "Allows users to query Bitbucket Commits, providing detailed information about each commit made in the Bitbucket repositories."
+---
 
-Bitbucket commit is an operation which sends the latest changes of the source code to the Bitbucket repository, making these changes part of the head revision of the repository.
+# Table: bitbucket_commit - Query Bitbucket Commits using SQL
 
-The `bitbucket_commit` table can be used to query commits belonging to a repository, and **you must specify which repository** with `where repository_full_name='workspace/repository'`.
+Bitbucket is a web-based version control repository hosting service owned by Atlassian, for source code and development projects that use either Mercurial or Git revision control systems. Bitbucket offers both commercial plans and free accounts. It provides a way to manage and maintain versioning of source code, manage projects, work on your applications, and deploy them in a team environment.
+
+## Table Usage Guide
+
+The `bitbucket_commit` table provides insights into each commit made in the Bitbucket repositories. As a DevOps engineer or a developer, explore commit-specific details through this table, including commit messages, author details, and associated metadata. Utilize it to track changes, understand version history, and manage your development workflow more effectively.
 
 ## Examples
 
 ### List the commits in a repository
+Discover the segments that have made changes in a specific repository. This can be used to track changes, understand the context of modifications, and identify the contributors involved.
 
 ```sql
 select
@@ -22,6 +30,7 @@ where
 ```
 
 ### List the commits by a specific author
+Explore the specific contributions made by an individual author within a particular repository. This could be useful for assessing their productivity or understanding the nature of their contributions.
 
 ```sql
 select

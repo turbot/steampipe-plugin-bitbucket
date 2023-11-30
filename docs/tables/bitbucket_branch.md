@@ -1,12 +1,20 @@
-# Table: bitbucket_branch
+---
+title: "Steampipe Table: bitbucket_branch - Query Bitbucket Branches using SQL"
+description: "Allows users to query Bitbucket Branches, specifically providing details about each branch in a Bitbucket repository, including its name, type, and associated commit."
+---
 
-A branch represents an independent line of development. Branches serve as an abstraction for the edit/stage/commit process. You can think of them as a way to request a brand new working directory, staging area, and project history. New commits are recorded in the history for the current branch, which results in a fork in the history of the project.
+# Table: bitbucket_branch - Query Bitbucket Branches using SQL
 
-The `bitbucket_branch` table can be used to query branches belonging to a repository, and **you must specify which repository** with `where repository_full_name='workspace/repository'`.
+Bitbucket is a Git-based source code repository hosting service owned by Atlassian. Bitbucket branches represent independent lines of development within a repository. They allow developers to work on features or fixes without interfering with the main (or 'master') codebase, and can be merged back into the main codebase when the work is complete.
+
+## Table Usage Guide
+
+The `bitbucket_branch` table provides insights into branches within Bitbucket. As a developer or DevOps engineer, explore branch-specific details through this table, including branch name, type, and associated commit. Utilize it to uncover information about branches, such as their current status, the associated commit, and the overall structure of development within a repository.
 
 ## Examples
 
 ### List branches in a repository
+Explore the branches within a specific repository to understand their default merge strategies and types. This can be useful for managing and optimizing your project's workflow within Bitbucket.
 
 ```sql
 select
@@ -21,6 +29,7 @@ where
 ```
 
 ### List branches with `merge_commit` default merge strategy
+Explore which branches within a specific repository utilize the 'merge_commit' as their default merge strategy. This is useful for understanding the merging practices and strategies within your project.
 
 ```sql
 select
