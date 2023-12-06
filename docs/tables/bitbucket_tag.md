@@ -11,12 +11,15 @@ Bitbucket Tags are reference points in your code, marking specific points in you
 
 The `bitbucket_tag` table provides insights into tags within Bitbucket repositories. As a DevOps engineer, explore tag-specific details through this table, including the repository it belongs to, its name, and its associated details. Utilize it to manage and organize your codebase effectively, identify current versions of your application, and navigate through your repository with ease.
 
+**Important Notes**
+- You must specify the `repository_full_name` in the `where` clause to query this table.
+
 ## Examples
 
 ### Get commits by tags
 Explore which commits are associated with tags in a specific repository. This can be helpful in understanding the relationship between commits and tags in your Bitbucket workspace, aiding in version control and project management.
 
-```sql
+```sql+postgres
 select
   name,
   repository_full_name,
@@ -25,4 +28,8 @@ from
   bitbucket_tag
 where
   repository_full_name = 'my-workspace/my-repo';
+```
+
+```sql+sqlite
+Error: SQLite does not support split_part function.
 ```

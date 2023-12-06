@@ -11,12 +11,28 @@ Bitbucket is a web-based version control repository hosting service owned by Atl
 
 The `bitbucket_commit` table provides insights into each commit made in the Bitbucket repositories. As a DevOps engineer or a developer, explore commit-specific details through this table, including commit messages, author details, and associated metadata. Utilize it to track changes, understand version history, and manage your development workflow more effectively.
 
+**Important Notes**
+- You must specify the `repository_full_name` in the `where` clause in order to query this table.
+
 ## Examples
 
 ### List the commits in a repository
 Discover the segments that have made changes in a specific repository. This can be used to track changes, understand the context of modifications, and identify the contributors involved.
 
-```sql
+```sql+postgres
+select
+  repository_full_name,
+  hash,
+  message,
+  author_display_name,
+  author_uuid
+from
+  bitbucket_commit
+where
+  repository_full_name = 'sayan97tb/stmp-rep';
+```
+
+```sql+sqlite
 select
   repository_full_name,
   hash,
@@ -32,7 +48,21 @@ where
 ### List the commits by a specific author
 Explore the specific contributions made by an individual author within a particular repository. This could be useful for assessing their productivity or understanding the nature of their contributions.
 
-```sql
+```sql+postgres
+select
+  repository_full_name,
+  hash,
+  message,
+  author_display_name,
+  author_uuid
+from
+  bitbucket_commit
+where
+  repository_full_name = 'sayan97tb/stmp-rep'
+  and author_display_name = 'sayan';
+```
+
+```sql+sqlite
 select
   repository_full_name,
   hash,

@@ -11,12 +11,29 @@ Bitbucket Projects is a feature within Bitbucket that allows users to group repo
 
 The `bitbucket_project` table provides insights into projects within Bitbucket. As a DevOps engineer or a software developer, explore project-specific details through this table, including project permissions, associated repositories, and other metadata. Utilize it to uncover information about projects, such as those with specific access controls, the associated repositories within each project, and the overall structure of your Bitbucket projects.
 
+**Important Notes**
+- You must specify the `workspace_slug` in the `where` or `join` clause (`where workspace_slug =`, `join bitbucket_project on workspace_slug =`) to query this table.
+
 ## Examples
 
 ### Get information about a specific project
 Explore the details of a specific project by identifying key attributes such as the project name, unique identifier, workspace slug, owner's display name, and its privacy status. This can be particularly useful for project management and auditing purposes, allowing for a better understanding of project ownership and privacy settings.
 
-```sql
+```sql+postgres
+select
+  name,
+  uuid,
+  key as project_key,
+  workspace_slug,
+  owner_display_name,
+  is_private
+from
+  bitbucket_project
+where
+  workspace_slug = 'np1981';
+```
+
+```sql+sqlite
 select
   name,
   uuid,
