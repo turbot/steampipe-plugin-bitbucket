@@ -8,6 +8,7 @@ short_name: "bitbucket"
 description: "Steampipe plugin for querying repositories, issues, pull requests and more from Bitbucket."
 og_description: "Query Bitbucket with SQL! Open source CLI. No DB required."
 og_image: "/images/plugins/turbot/bitbucket-social-graphic.png"
+engines: ["steampipe", "sqlite", "postgres", "export"]
 ---
 
 # Bitbucket + Steampipe
