@@ -1,14 +1,25 @@
-# Table: bitbucket_tag
+---
+title: "Steampipe Table: bitbucket_tag - Query Bitbucket Tags using SQL"
+description: "Allows users to query Bitbucket Tags, specifically the name, repository, and other details of tags in a repository, providing insights into version control and codebase organization."
+---
 
-Tags mark a specific commit at a point in your repository history. When you tag a commit, you're including all the changes before it. You can later compare tags to see the difference between two points in history. Tags are commonly used to mark release versions, with the release name as the tag name.
+# Table: bitbucket_tag - Query Bitbucket Tags using SQL
 
-The `bitbucket_tag` table can be used to query information about ANY repository, and **you must specify which repository** in the where.
+Bitbucket Tags are reference points in your code, marking specific points in your repository's history. It's a way to capture a point in history that marks a significant event, such as a release. Bitbucket tags make it easier to navigate through the repository, identify current versions, and manage your codebase effectively. 
+
+## Table Usage Guide
+
+The `bitbucket_tag` table provides insights into tags within Bitbucket repositories. As a DevOps engineer, explore tag-specific details through this table, including the repository it belongs to, its name, and its associated details. Utilize it to manage and organize your codebase effectively, identify current versions of your application, and navigate through your repository with ease.
+
+**Important Notes**
+- You must specify the `repository_full_name` in the `where` clause to query this table.
 
 ## Examples
 
 ### Get commits by tags
+Explore which commits are associated with tags in a specific repository. This can be helpful in understanding the relationship between commits and tags in your Bitbucket workspace, aiding in version control and project management.
 
-```sql
+```sql+postgres
 select
   name,
   repository_full_name,
@@ -17,4 +28,8 @@ from
   bitbucket_tag
 where
   repository_full_name = 'my-workspace/my-repo';
+```
+
+```sql+sqlite
+Error: SQLite does not support split_part function.
 ```

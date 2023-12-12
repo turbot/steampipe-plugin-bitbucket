@@ -8,13 +8,14 @@ short_name: "bitbucket"
 description: "Steampipe plugin for querying repositories, issues, pull requests and more from Bitbucket."
 og_description: "Query Bitbucket with SQL! Open source CLI. No DB required."
 og_image: "/images/plugins/turbot/bitbucket-social-graphic.png"
+engines: ["steampipe", "sqlite", "postgres", "export"]
 ---
 
 # Bitbucket + Steampipe
 
 [Bitbucket](https://bitbucket.org) is a Git-based source code repository hosting service owned by Atlassian.
 
-[Steampipe](https://steampipe.io) is an open source CLI to instantly query cloud APIs using SQL.
+[Steampipe](https://steampipe.io) is an open-source zero-ETL engine to instantly query cloud APIs using SQL.
 
 For example:
 
@@ -81,7 +82,4 @@ connection "bitbucket" {
 }
 ```
 
-## Get involved
 
-- Open source: https://github.com/turbot/steampipe-plugin-bitbucket
-- Community: [Join #steampipe on Slack →](https://turbot.com/community/join)

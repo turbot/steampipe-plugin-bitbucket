@@ -1,16 +1,37 @@
-# Table: bitbucket_my_repository
+---
+title: "Steampipe Table: bitbucket_my_repository - Query Bitbucket Repositories using SQL"
+description: "Allows users to query Bitbucket Repositories, providing details about each repository including its name, project key, size, and more."
+---
 
-A repository contains all of your project's files and each file's revision history.
+# Table: bitbucket_my_repository - Query Bitbucket Repositories using SQL
 
-You can own repositories individually, or you can share ownership of repositories with other people in an organization. The `bitbucket_my_repository` table will list repositories your username own or that belong to your workspaces.
+Bitbucket is a web-based version control repository hosting service owned by Atlassian, for source code and development projects that use either Mercurial or Git revision control systems. Bitbucket offers both commercial plans and free accounts. It provides a way for developers to manage and maintain their code, with features such as pull requests, branching, and in-line commenting.
 
-To query **ANY** repository, including public repos, use the `bitbucket_repository` table.
+## Table Usage Guide
+
+The `bitbucket_my_repository` table provides insights into repositories within Bitbucket. As a developer or project manager, explore repository-specific details through this table, including repository name, project key, size, and other metadata. Utilize it to uncover information about repositories, such as those with the most recent commits, the size of each repository, and the associated project key.
+
+**Important Notes**
+- To query ANY repository, including public repositories, use the `bitbucket_repository` table.
 
 ## Examples
 
 ### List of repositories that you or your workspace owns
+Explore the repositories that you or your workspace own, to manage and organize your projects better. This allows you to assess the ownership of different repositories, enhancing your control and coordination over them.
 
-```sql
+```sql+postgres
+select
+  name,
+  uuid,
+  full_name,
+  owner_display_name
+from
+  bitbucket_my_repository
+order by
+  full_name;
+```
+
+```sql+sqlite
 select
   name,
   uuid,
@@ -23,8 +44,21 @@ order by
 ```
 
 ### List your public repositories
+Explore which of your Bitbucket repositories are publicly accessible. This can be useful to ensure sensitive information is not inadvertently exposed.
 
-```sql
+```sql+postgres
+select
+  name,
+  is_private,
+  full_name,
+  owner_display_name
+from
+  bitbucket_my_repository
+where
+  not is_private;
+```
+
+```sql+sqlite
 select
   name,
   is_private,
@@ -37,8 +71,9 @@ where
 ```
 
 ### List the unassigned open issues in your repositories
+Discover the segments that have unresolved issues in your repositories that are yet to be assigned. This is useful for identifying potential bottlenecks in your workflow, allowing you to take remedial action and improve efficiency.
 
-```sql
+```sql+postgres
 select
   i.repository_full_name,
   i.id,
@@ -55,9 +90,14 @@ where
   and i.state = 'new';
 ```
 
-### List details of the default reviewers of your repositories
+```sql+sqlite
+Error: The corresponding SQLite query is unavailable.
+```
 
-```sql
+### List details of the default reviewers of your repositories
+Gain insights into who are set as default reviewers for your repositories, helpful in understanding the review process and ensuring the right people are involved in code reviews.
+
+```sql+postgres
 with default_reviewers as (
   select
   full_name as repository_name,
@@ -79,9 +119,44 @@ from
   default_reviewers;
 ```
 
-### List the repositories without default reviewers
+```sql+sqlite
+with default_reviewers as (
+  select
+  full_name as repository_name,
+  json_extract(r.value, '$.AccountId') as reviewer_account_id,
+  json_extract(r.value, '$.Uuid') as reviewer_uuid,
+  json_extract(r.value, '$.DisplayName') as reviewer_display_name,
+  json_extract(r.value, '$.Type') as reviewer_type
+from
+  bitbucket_my_repository,
+  json_each(default_reviewers) as r
+)
+select
+  repository_name,
+  reviewer_account_id,
+  reviewer_uuid,
+  reviewer_display_name,
+  reviewer_type
+from
+  default_reviewers;
+```
 
-```sql
+### List the repositories without default reviewers
+Discover the segments that have repositories without designated default reviewers. This is useful for identifying potential areas of oversight, ensuring that all repositories have appropriate review processes in place.
+
+```sql+postgres
+select
+  name,
+  uuid,
+  full_name,
+  owner_display_name
+from
+  bitbucket_my_repository
+where
+  default_reviewers is null;
+```
+
+```sql+sqlite
 select
   name,
   uuid,
