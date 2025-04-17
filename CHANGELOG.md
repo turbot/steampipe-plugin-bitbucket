@@ -1,3 +1,10 @@
+## v1.1.0 [2025-04-17]
+
+_Dependencies_
+
+- Recompiled plugin with Go version `1.23.1`. ([#112](https://github.com/turbot/steampipe-plugin-bitbucket/pull/112))
+- Recompiled plugin with [steampipe-plugin-sdk v5.11.5](https://github.com/turbot/steampipe-plugin-sdk/blob/v5.11.5/CHANGELOG.md#v5115-2025-03-31) that addresses critical and high vulnerabilities in dependent packages. ([#112](https://github.com/turbot/steampipe-plugin-bitbucket/pull/112))
+
 ## v1.0.0 [2024-10-22]
 
 There are no significant changes in this plugin version; it has been released to align with [Steampipe's v1.0.0](https://steampipe.io/changelog/steampipe-cli-v1-0-0) release. This plugin adheres to [semantic versioning](https://semver.org/#semantic-versioning-specification-semver), ensuring backward compatibility within each major version.
