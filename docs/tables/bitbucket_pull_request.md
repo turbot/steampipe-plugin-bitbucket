@@ -25,7 +25,7 @@ select
   id,
   title,
   state,
-  branch_name,
+  source_branch_name,
   author_display_name
 from
   bitbucket_pull_request
@@ -40,7 +40,7 @@ select
   id,
   title,
   state,
-  branch_name,
+  source_branch_name,
   author_display_name
 from
   bitbucket_pull_request

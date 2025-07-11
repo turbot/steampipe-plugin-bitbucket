@@ -53,6 +53,11 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Description: "Details of the target branch where the pull request is intended to be merged, including branch name, latest commit metadata, and destination repository information.",
 				Type:        proto.ColumnType_JSON,
 			},
+			{
+				Name:        "source",
+				Description: "Details of the source branch where the pull request originates from, including branch name, latest commit metadata, and source repository information.",
+				Type:        proto.ColumnType_JSON,
+			},
 
 			// other fields
 			{
@@ -68,10 +73,16 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Transform:   transform.FromField("Author.uuid"),
 			},
 			{
-				Name:        "branch_name",
+				Name:        "source_branch_name",
 				Description: "Name of the source branch for the pull request.",
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Source.branch.name"),
+			},
+			{
+				Name:        "destination_branch_name",
+				Description: "Name of the destination branch for the pull request.",
+				Type:        proto.ColumnType_STRING,
+				Transform:   transform.FromField("Destination.branch.name"),
 			},
 			{
 				Name:        "comment_count",
