@@ -52,7 +52,6 @@ func tableBitbucketPullRequest(_ context.Context) *plugin.Table {
 				Name:        "destination",
 				Description: "Details of the target branch where the pull request is intended to be merged, including branch name, latest commit metadata, and destination repository information.",
 				Type:        proto.ColumnType_JSON,
-				Transform:   transform.FromField("Destination"),
 			},
 
 			// other fields
