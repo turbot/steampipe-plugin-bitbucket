@@ -1,3 +1,17 @@
+## v1.2.0 [2025-07-17]
+
+_Enhancements_
+
+- Added `destination`, `source` and `destination_branch_name` columns to the `bitbucket_pull_request` table. ([#119](https://github.com/turbot/steampipe-plugin-bitbucket/pull/119))
+
+_Bug fixes_
+
+- Renamed the incorrectly named `branch_name` column to `source_branch_name` in the `bitbucket_pull_request` table to reflect the correct source branch of the pull request. ([#119](https://github.com/turbot/steampipe-plugin-bitbucket/pull/119))
+
+_Dependencies_
+
+- Recompiled plugin with [steampipe-plugin-sdk v5.11.7](https://github.com/turbot/steampipe-plugin-sdk/blob/develop/CHANGELOG.md#v5117-2025-06-04) which resolves an issue where rate limiters were not being applied to hydrate functions correctly. ([#115](https://github.com/turbot/steampipe-plugin-bitbucket/pull/115))
+
 ## v1.1.1 [2025-04-18]
 
 _Bug fixes_
