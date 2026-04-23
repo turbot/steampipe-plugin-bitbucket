@@ -1,13 +1,13 @@
 connection "bitbucket" {
   plugin = "bitbucket"
 
-  # Bitbucket username.
+  # Atlassian account email (the address listed under "Email Aliases" in your Bitbucket Personal settings).
   # Can also be set with the BITBUCKET_USERNAME environment variable.
-  # username = "MyUsername"
+  # username = "me@example.com"
 
-  # Bitbucket app password, which can be created at https://bitbucket.org/account/settings/app-passwords/.
+  # Bitbucket API token, created at https://id.atlassian.com/manage-profile/security/api-tokens.
   # Can also be set with the BITBUCKET_PASSWORD environment variable.
-  # password = "blHdmvlkFakeToken"
+  # password = "ATATT3xFfGF0FakeToken"
 
   # Base URL of your Bitbucket Server.
   # Defaults to "https://api.bitbucket.org/2.0".

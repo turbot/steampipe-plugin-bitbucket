@@ -56,8 +56,8 @@ steampipe plugin install bitbucket
 
 | Item        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | :---------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Credentials | Bitbucket requires an [app password](https://bitbucket.org/account/settings/app-passwords/).                                                                                                                                                                                                                                                                                                                                                                                                         |
-| Permissions | You must create app password with the following [scopes](https://developer.atlassian.com/cloud/bitbucket/rest/intro/#scopes):<br />&nbsp;&nbsp;&nbsp;&nbsp;- `account:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `issue:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `pullrequest:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `repository:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `snippet:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `webhook:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `wiki:read`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `workspace:read` |
+| Credentials | Bitbucket requires an [API token](https://support.atlassian.com/bitbucket-cloud/docs/create-an-api-token/). Set `username` to your **Atlassian account email** (listed under *Email Aliases* in your Bitbucket Personal settings), not your Bitbucket username, and `password` to the API token. |
+| Permissions | Create the token via *Atlassian account settings → Security → Create and manage API tokens → Create API token with scopes*, select **Bitbucket** as the app, and grant these [scopes](https://support.atlassian.com/bitbucket-cloud/docs/api-token-permissions/):<br />&nbsp;&nbsp;&nbsp;&nbsp;- `read:user:bitbucket`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `read:workspace:bitbucket`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `read:project:bitbucket`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `read:repository:bitbucket`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `read:pullrequest:bitbucket`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `read:issue:bitbucket`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `read:snippet:bitbucket`<br />&nbsp;&nbsp;&nbsp;&nbsp;- `read:webhook:bitbucket` |
 
 ### Configuration
 
@@ -67,13 +67,13 @@ Installing the latest bitbucket plugin will create a config file (`~/.steampipe/
 connection "bitbucket" {
   plugin = "bitbucket"
 
-  # Bitbucket username.
+  # Atlassian account email (the address listed under "Email Aliases" in your Bitbucket Personal settings).
   # Can also be set with the BITBUCKET_USERNAME environment variable.
-  # username = "MyUsername"
+  # username = "me@example.com"
 
-  # Bitbucket app password, which can be created at https://bitbucket.org/account/settings/app-passwords/.
+  # Bitbucket API token, created at https://id.atlassian.com/manage-profile/security/api-tokens.
   # Can also be set with the BITBUCKET_PASSWORD environment variable.
-  # password = "blHdmvlkFakeToken"
+  # password = "ATATT3xFfGF0FakeToken"
 
   # Base URL of your Bitbucket Server.
   # Defaults to "https://api.bitbucket.org/2.0".
