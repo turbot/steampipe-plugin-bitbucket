@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/ktrysmt/go-bitbucket v0.9.16
-	github.com/turbot/steampipe-plugin-sdk/v5 v5.14.0
+	github.com/turbot/steampipe-plugin-sdk/v5 v5.14.1
 )
 
 require (
