@@ -3,6 +3,7 @@ package bitbucket
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/ktrysmt/go-bitbucket"
@@ -114,36 +115,23 @@ func bitbucketProjectColumns() []*plugin.Column {
 func tableBitbucketMyProjectList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Trace("tableBitbucketMyProjectList")
 	workspace := h.Item.(bitbucket.Workspace)
-	client := connect(ctx, d)
+	urlStr := connect(ctx, d).GetApiBaseURL() + fmt.Sprintf("/workspaces/%s/projects", workspace.Slug)
 
-	urlStr := client.GetApiBaseURL() + fmt.Sprintf("/workspaces/%s/projects", workspace.Slug)
-
-	for {
-		resp, err := client.HttpClient.Get(urlStr)
-		if err != nil {
-			return nil, err
-		}
+	err := page(ctx, d, urlStr, func(resp *http.Response) (string, bool, error) {
 		projectList := new(ProjectList)
-		err = decodeResponse(resp, projectList)
-		if err != nil {
-			return nil, err
+		if err := decodeResponse(resp, projectList); err != nil {
+			return "", false, err
 		}
-
 		for _, project := range projectList.Projects {
 			d.StreamListItem(ctx, project)
-
-			// Context can be cancelled due to manual cancellation or the limit has been hit
 			if d.RowsRemaining(ctx) == 0 {
-				return nil, nil
+				return "", false, nil
 			}
 		}
+		return projectList.Next, true, nil
+	})
 
-		if projectList.Next == "" {
-			return nil, nil
-		}
-		// update urlstring with the link of next page
-		urlStr = projectList.Next
-	}
+	return nil, err
 }
 
 //// Hydrate Function

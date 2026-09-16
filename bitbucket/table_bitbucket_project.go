@@ -3,6 +3,7 @@ package bitbucket
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
@@ -31,38 +32,23 @@ func tableBitbucketProjectList(ctx context.Context, d *plugin.QueryData, h *plug
 		return nil, nil
 	}
 
-	client := connect(ctx, d)
-	urlStr := client.GetApiBaseURL() + fmt.Sprintf("/workspaces/%s/projects", workspace)
+	urlStr := connect(ctx, d).GetApiBaseURL() + fmt.Sprintf("/workspaces/%s/projects", workspace)
 
-	for {
-		resp, err := client.HttpClient.Get(urlStr)
-		if err != nil {
-			if isNotFoundError(err) {
-				return nil, nil
-			}
-			return nil, err
-		}
+	err := page(ctx, d, urlStr, func(resp *http.Response) (string, bool, error) {
 		projectList := new(ProjectList)
-		err = decodeResponse(resp, projectList)
-		if err != nil {
-			return nil, err
+		if err := decodeResponse(resp, projectList); err != nil {
+			return "", false, err
 		}
-
 		for _, project := range projectList.Projects {
 			d.StreamListItem(ctx, project)
-
-			// Context can be cancelled due to manual cancellation or the limit has been hit
 			if d.RowsRemaining(ctx) == 0 {
-				return nil, nil
+				return "", false, nil
 			}
 		}
+		return projectList.Next, true, nil
+	})
 
-		if projectList.Next == "" {
-			return nil, nil
-		}
-		// update urlstring with the link of next page
-		urlStr = projectList.Next
-	}
+	return nil, err
 }
 
 func tableBitbucketProjectGet(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
@@ -73,12 +59,11 @@ func tableBitbucketProjectGet(ctx context.Context, d *plugin.QueryData, h *plugi
 		return nil, nil
 	}
 
-	client := connect(ctx, d)
-	urlStr := client.GetApiBaseURL() + fmt.Sprintf("/workspaces/%s/projects/%s", workspace, key)
+	urlStr := connect(ctx, d).GetApiBaseURL() + fmt.Sprintf("/workspaces/%s/projects/%s", workspace, key)
 
-	resp, err := client.HttpClient.Get(urlStr)
+	resp, err := authGet(ctx, d, urlStr)
 	if err != nil {
-		if isNotFoundError(err) {
+		if isNotFoundError(err) || isForbiddenError(err) {
 			return nil, nil
 		}
 		return nil, err

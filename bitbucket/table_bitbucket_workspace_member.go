@@ -2,6 +2,8 @@ package bitbucket
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/ktrysmt/go-bitbucket"
@@ -80,6 +82,12 @@ func tableBitbucketWorkspaceMember(_ context.Context) *plugin.Table {
 				Type:        proto.ColumnType_STRING,
 				Transform:   transform.FromField("Workspace.Slug"),
 			},
+			{
+				Name:        "has_2fa_enabled",
+				Description: "True if the member has two-step verification enabled, false if not, and null when Bitbucket declines to report it. Null is not the same as false.",
+				Type:        proto.ColumnType_BOOL,
+				Transform:   transform.FromField("User.Has2faEnabled"),
+			},
 
 			// Standard columns
 			{
@@ -96,37 +104,32 @@ func tableBitbucketWorkspaceMemberList(ctx context.Context, d *plugin.QueryData,
 	plugin.Logger(ctx).Trace("tableBitbucketWorkspaceMemberList")
 
 	workspaceSlug := d.EqualsQuals["workspace_slug"].GetStringValue()
-	client := connect(ctx, d)
-
-	response, err := client.Workspaces.Members(workspaceSlug)
-	if err != nil {
-		if isNotFoundError(err) || isForbiddenError(err) {
-			return nil, nil
-		}
-		plugin.Logger(ctx).Error("tableBitbucketWorkspaceMemberList", "Error", err)
-		return nil, err
-	}
-
-	if response == nil {
+	if workspaceSlug == "" {
 		return nil, nil
 	}
 
-	memberList := new(MemberList)
-	err = decodeJson(response, memberList)
-	if err != nil {
-		return nil, err
-	}
+	client := connect(ctx, d)
+	// `has_2fa_enabled` is absent from the default representation; only this expansion makes
+	// Bitbucket emit the key at all. Read directly rather than through Workspaces.Members, which
+	// takes no field selection and returns the first page only.
+	urlStr := client.GetApiBaseURL() + fmt.Sprintf(
+		"/workspaces/%s/members?fields=%%2Bvalues.user.has_2fa_enabled", workspaceSlug)
 
-	for _, item := range memberList.Members {
-		d.StreamListItem(ctx, item)
-
-		// Context can be cancelled due to manual cancellation or the limit has been hit
-		if d.RowsRemaining(ctx) == 0 {
-			return nil, nil
+	err := page(ctx, d, urlStr, func(resp *http.Response) (string, bool, error) {
+		memberList := new(MemberList)
+		if err := decodeResponse(resp, memberList); err != nil {
+			return "", false, err
 		}
-	}
+		for _, item := range memberList.Members {
+			d.StreamListItem(ctx, item)
+			if d.RowsRemaining(ctx) == 0 {
+				return "", false, nil
+			}
+		}
+		return memberList.Next, true, nil
+	})
 
-	return nil, nil
+	return nil, err
 }
 
 type MemberList struct {
@@ -142,11 +145,14 @@ type Member struct {
 }
 
 type User struct {
-	AccountId     string                 `json:"account_id,omitempty"`
-	AccountStatus string                 `json:"account_status,omitempty"`
-	CreatedOn     *time.Time             `json:"created_on,omitempty"`
-	DisplayName   string                 `json:"display_name,omitempty"`
-	Has2faEnabled bool                   `json:"has_2fa_enabled,omitempty"`
+	AccountId     string     `json:"account_id,omitempty"`
+	AccountStatus string     `json:"account_status,omitempty"`
+	CreatedOn     *time.Time `json:"created_on,omitempty"`
+	DisplayName   string     `json:"display_name,omitempty"`
+	// A pointer, not a bool: Bitbucket returns null here for members of a workspace that does not
+	// enforce two-step verification, and decoding that as false asserts a security posture the API
+	// never reported.
+	Has2faEnabled *bool                  `json:"has_2fa_enabled,omitempty"`
 	IsStaff       bool                   `json:"is_staff,omitempty"`
 	Nickname      string                 `json:"nickname,omitempty"`
 	Type          string                 `json:"type,omitempty"`
