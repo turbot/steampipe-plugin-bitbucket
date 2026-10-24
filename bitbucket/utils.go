@@ -154,10 +154,31 @@ func page(
 	urlStr string,
 	decode func(resp *http.Response) (string, bool, error),
 ) error {
+	return walkPages(ctx, d, urlStr, true, decode)
+}
+
+// pageReportingForbidden is page, except that a 403 is returned as an error, for tables where a
+// missing scope must not read as an empty collection.
+func pageReportingForbidden(
+	ctx context.Context,
+	d *plugin.QueryData,
+	urlStr string,
+	decode func(resp *http.Response) (string, bool, error),
+) error {
+	return walkPages(ctx, d, urlStr, false, decode)
+}
+
+func walkPages(
+	ctx context.Context,
+	d *plugin.QueryData,
+	urlStr string,
+	forbiddenIsEmpty bool,
+	decode func(resp *http.Response) (string, bool, error),
+) error {
 	for urlStr != "" {
 		resp, err := authGet(ctx, d, urlStr)
 		if err != nil {
-			if isNotFoundError(err) || isForbiddenError(err) {
+			if isNotFoundError(err) || (forbiddenIsEmpty && isForbiddenError(err)) {
 				return nil
 			}
 			return err
