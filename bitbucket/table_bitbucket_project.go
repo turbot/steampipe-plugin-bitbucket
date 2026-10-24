@@ -72,6 +72,7 @@ func tableBitbucketProjectGet(ctx context.Context, d *plugin.QueryData, h *plugi
 	if resp == nil {
 		return nil, nil
 	}
+	defer func() { _ = resp.Body.Close() }()
 
 	project := new(Project)
 	err = decodeResponse(resp, project)

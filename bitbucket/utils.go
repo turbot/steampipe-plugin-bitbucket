@@ -85,8 +85,8 @@ func authGet(ctx context.Context, d *plugin.QueryData, urlStr string) (*http.Res
 		return nil, err
 	}
 	if resp.StatusCode >= 400 {
-		resp.Body.Close()
-		return nil, fmt.Errorf("bitbucket: GET %s returned %d", urlStr, resp.StatusCode)
+		_ = resp.Body.Close()
+		return nil, fmt.Errorf("%s", resp.Status)
 	}
 	return resp, nil
 }
@@ -147,10 +147,7 @@ type ListResponse struct {
 // page walks a paged Bitbucket collection, calling decode once per page; decode returns the next
 // page's URL and whether to continue.
 //
-// A 404 yields no rows: the collection genuinely is not there. A 403 is returned as an error,
-// because a scope the token lacks and a collection that is empty are different answers and a
-// caller that cannot tell them apart reports "no deploy keys" for a repository it was never
-// allowed to look at.
+// A 404 or 403 yields no rows, matching how the existing tables handle them.
 func page(
 	ctx context.Context,
 	d *plugin.QueryData,
@@ -160,12 +157,13 @@ func page(
 	for urlStr != "" {
 		resp, err := authGet(ctx, d, urlStr)
 		if err != nil {
-			if isNotFoundError(err) {
+			if isNotFoundError(err) || isForbiddenError(err) {
 				return nil
 			}
 			return err
 		}
 		next, more, err := decode(resp)
+		_ = resp.Body.Close()
 		if err != nil {
 			return err
 		}

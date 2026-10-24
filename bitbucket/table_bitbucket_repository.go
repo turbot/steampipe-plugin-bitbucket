@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ktrysmt/go-bitbucket"
+
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
@@ -47,6 +49,7 @@ func tableBitbucketRepositoryList(ctx context.Context, d *plugin.QueryData, _ *p
 		}
 		return nil, err
 	}
+	defer func() { _ = resp.Body.Close() }()
 
 	repo := new(Repo)
 	if err := decodeResponse(resp, repo); err != nil {
@@ -81,28 +84,28 @@ func listWorkspaceRepositories(ctx context.Context, d *plugin.QueryData, workspa
 // API carries more than that struct models — `created_on`, `updated_on`, `size` and `scm` among
 // them — and those are what tells a stale repository from a live one.
 type Repo struct {
-	CreatedOn             *time.Time             `json:"created_on"`
-	Description           string                 `json:"description"`
-	EnforcedSignedCommits *bool                  `json:"enforced_signed_commits"`
-	ForkPolicy            string                 `json:"fork_policy"`
-	Full_name             string                 `json:"full_name"`
-	Has_issues            bool                   `json:"has_issues"`
-	Is_private            bool                   `json:"is_private"`
-	Language              string                 `json:"language"`
-	Links                 map[string]interface{} `json:"links"`
-	Mainbranch            map[string]interface{} `json:"mainbranch"`
-	Name                  string                 `json:"name"`
-	Owner                 map[string]interface{} `json:"owner"`
-	Parent                map[string]interface{} `json:"parent"`
-	Project               RepoProject            `json:"project"`
-	Scm                   string                 `json:"scm"`
-	Size                  int64                  `json:"size"`
-	Slug                  string                 `json:"slug"`
-	Type                  string                 `json:"type"`
-	UpdatedOn             *time.Time             `json:"updated_on"`
-	Uuid                  string                 `json:"uuid"`
-	Website               string                 `json:"website"`
-	Workspace             RepoWorkspace          `json:"workspace"`
+	CreatedOn             *time.Time                 `json:"created_on"`
+	Description           string                     `json:"description"`
+	EnforcedSignedCommits *bool                      `json:"enforced_signed_commits"`
+	ForkPolicy            string                     `json:"fork_policy"`
+	Full_name             string                     `json:"full_name"`
+	Has_issues            bool                       `json:"has_issues"`
+	Is_private            bool                       `json:"is_private"`
+	Language              string                     `json:"language"`
+	Links                 map[string]interface{}     `json:"links"`
+	Mainbranch            bitbucket.RepositoryBranch `json:"mainbranch"`
+	Name                  string                     `json:"name"`
+	Owner                 map[string]interface{}     `json:"owner"`
+	Parent                map[string]interface{}     `json:"parent"`
+	Project               RepoProject                `json:"project"`
+	Scm                   string                     `json:"scm"`
+	Size                  int64                      `json:"size"`
+	Slug                  string                     `json:"slug"`
+	Type                  string                     `json:"type"`
+	UpdatedOn             *time.Time                 `json:"updated_on"`
+	Uuid                  string                     `json:"uuid"`
+	Website               *string                    `json:"website"`
+	Workspace             RepoWorkspace              `json:"workspace"`
 }
 
 type RepoProject struct {
