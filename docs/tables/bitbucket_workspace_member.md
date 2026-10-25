@@ -13,8 +13,37 @@ The `bitbucket_workspace_member` table provides insights into workspace members 
 
 **Important Notes**
 - You must specify the `workspace_slug` in the `where` or `join` clause (`where workspace_slug=`, `join bitbucket_workspace_member on workspace_slug=`) to query this table.
+- `has_2fa_enabled` is null whenever Bitbucket declines to report a member's two-step verification status, which it does for every member of a workspace that does not enforce it — including to a workspace owner. Null is not false: treat it as unknown, or a report will claim two-step verification is disabled for people who have it on.
 
 ## Examples
+
+### Find members whose two-step verification is off
+Members whose status Bitbucket does not disclose are excluded: `has_2fa_enabled` is null for those, and counting null as disabled raises a finding against every member of most workspaces.
+
+```sql+postgres
+select
+  display_name,
+  account_id,
+  has_2fa_enabled
+from
+  bitbucket_workspace_member
+where
+  workspace_slug = 'my-workspace'
+  and has_2fa_enabled is false;
+```
+
+```sql+sqlite
+select
+  display_name,
+  account_id,
+  has_2fa_enabled
+from
+  bitbucket_workspace_member
+where
+  workspace_slug = 'my-workspace'
+  and has_2fa_enabled = 0;
+```
+
 
 ### List members in the workspace
 Explore which members are part of a specific workspace, providing an overview of who has access to shared resources and projects. This is particularly useful for workspace administrators to manage access and permissions effectively.
