@@ -3,6 +3,7 @@ package bitbucket
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -12,7 +13,7 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 )
 
-//// Constants
+// // Constants
 const (
 	ColumnDescriptionTitle = "Title of the resource."
 )
@@ -51,6 +52,43 @@ func connect(_ context.Context, d *plugin.QueryData) *bitbucket.Client {
 		client.SetApiBaseURL(baseurl)
 	}
 	return client
+}
+
+func credentials(d *plugin.QueryData) (string, string) {
+	username := os.Getenv("BITBUCKET_USERNAME")
+	password := os.Getenv("BITBUCKET_PASSWORD")
+
+	bitbucketConfig := GetConfig(d.Connection)
+	if bitbucketConfig.Username != nil {
+		username = *bitbucketConfig.Username
+	}
+	if bitbucketConfig.Password != nil {
+		password = *bitbucketConfig.Password
+	}
+	return username, password
+}
+
+// authGet issues an authenticated GET. `client.HttpClient` is a bare *http.Client that carries no
+// credentials, so reading through it returns 401 for every private resource; the tables that reach
+// the API directly must attach basic auth themselves.
+func authGet(ctx context.Context, d *plugin.QueryData, urlStr string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, urlStr, nil)
+	if err != nil {
+		return nil, err
+	}
+	username, password := credentials(d)
+	req.SetBasicAuth(username, password)
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := connect(ctx, d).HttpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= 400 {
+		_ = resp.Body.Close()
+		return nil, fmt.Errorf("%s", resp.Status)
+	}
+	return resp, nil
 }
 
 func parseRepoFullName(fullName string) (string, string) {
@@ -104,4 +142,35 @@ type ListResponse struct {
 	Size     int    `json:"size,omitempty"`
 	Next     string `json:"next,omitempty"`
 	Previous string `json:"previous,omitempty"`
+}
+
+// page walks a paged Bitbucket collection, calling decode once per page; decode returns the next
+// page's URL and whether to continue.
+//
+// A 404 or 403 yields no rows, matching how the existing tables handle them.
+func page(
+	ctx context.Context,
+	d *plugin.QueryData,
+	urlStr string,
+	decode func(resp *http.Response) (string, bool, error),
+) error {
+	for urlStr != "" {
+		resp, err := authGet(ctx, d, urlStr)
+		if err != nil {
+			if isNotFoundError(err) || isForbiddenError(err) {
+				return nil
+			}
+			return err
+		}
+		next, more, err := decode(resp)
+		_ = resp.Body.Close()
+		if err != nil {
+			return err
+		}
+		if !more || d.RowsRemaining(ctx) == 0 {
+			return nil
+		}
+		urlStr = next
+	}
+	return nil
 }

@@ -45,15 +45,29 @@ func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, h 
 
 func tableBitbucketDefaultReviewersList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Debug("tableBitbucketDefaultReviewersList")
-	data := h.Item.(bitbucket.Repository)
-	owner:= data.Owner["display_name"]
-	uuid:= data.Uuid
-	repoSlug:= data.Slug
+
+	// `bitbucket_repository` streams Repo and `bitbucket_my_repository` streams
+	// bitbucket.Repository, and both share this column set. Owner is derived from full_name rather
+	// than the owner map, which carries no display_name for a workspace-owned repository.
+	var fullName, uuid string
+	switch data := h.Item.(type) {
+	case Repo:
+		fullName, uuid = data.Full_name, data.Uuid
+	case bitbucket.Repository:
+		fullName, uuid = data.Full_name, data.Uuid
+	default:
+		return nil, nil
+	}
+	owner, repoSlug := parseRepoFullName(fullName)
+	if owner == "" || repoSlug == "" {
+		return nil, nil
+	}
+
 	client := connect(ctx, d)
 
 	opts := &bitbucket.RepositoryOptions{
-		Owner: owner.(string),
-		Uuid:  uuid,
+		Owner:    owner,
+		Uuid:     uuid,
 		RepoSlug: repoSlug,
 	}
 
@@ -69,5 +83,5 @@ func tableBitbucketDefaultReviewersList(ctx context.Context, d *plugin.QueryData
 	if response == nil {
 		return nil, nil
 	}
-	return response.DefaultReviewers,nil
+	return response.DefaultReviewers, nil
 }
