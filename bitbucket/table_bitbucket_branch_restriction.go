@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/ktrysmt/go-bitbucket"
-	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v6/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin/transform"
 )
 
 func tableBitbucketBranchRestriction(_ context.Context) *plugin.Table {
@@ -114,7 +114,7 @@ func tableBitbucketBranchRestrictionsList(ctx context.Context, d *plugin.QueryDa
 	response, err := client.Repositories.BranchRestrictions.Gets(opts)
 	if err != nil {
 		if isForbiddenError(err) {
-			return nil, errors.New("Admin access to the repository is required in order to list the branch restrictions.")
+			return nil, errors.New("admin access to the repository is required in order to list the branch restrictions")
 		}
 		if isNotFoundError(err) {
 			return nil, nil
