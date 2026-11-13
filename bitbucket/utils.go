@@ -9,10 +9,10 @@ import (
 
 	"github.com/ktrysmt/go-bitbucket"
 
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
 )
 
-//// Constants
+// // Constants
 const (
 	ColumnDescriptionTitle = "Title of the resource."
 )

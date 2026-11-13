@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/ktrysmt/go-bitbucket"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
 )
 
 func tableBitbucketMyRepository(_ context.Context) *plugin.Table {
@@ -46,14 +46,14 @@ func tableBitbucketMyRepositoryList(ctx context.Context, d *plugin.QueryData, h 
 func tableBitbucketDefaultReviewersList(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	plugin.Logger(ctx).Debug("tableBitbucketDefaultReviewersList")
 	data := h.Item.(bitbucket.Repository)
-	owner:= data.Owner["display_name"]
-	uuid:= data.Uuid
-	repoSlug:= data.Slug
+	owner := data.Owner["display_name"]
+	uuid := data.Uuid
+	repoSlug := data.Slug
 	client := connect(ctx, d)
 
 	opts := &bitbucket.RepositoryOptions{
-		Owner: owner.(string),
-		Uuid:  uuid,
+		Owner:    owner.(string),
+		Uuid:     uuid,
 		RepoSlug: repoSlug,
 	}
 
@@ -69,5 +69,5 @@ func tableBitbucketDefaultReviewersList(ctx context.Context, d *plugin.QueryData
 	if response == nil {
 		return nil, nil
 	}
-	return response.DefaultReviewers,nil
+	return response.DefaultReviewers, nil
 }
